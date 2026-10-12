@@ -25,6 +25,7 @@ def split_data(dataframe, target_column = "Churn", test_size = 0.2, seed = 42):
 
     return x_train, x_test, y_train, y_test
 
+
 def data_loader(data_path):
     data = load_data(data_path)
     return split_data(data)
