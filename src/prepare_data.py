@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 TARGET_COLUMN = "Churn"
 TEST_SIZE = 0.2
 RANDOM_SEED = 42
-DEFAULT_PREPROCESSING_VARIATIONS = [["encode", "missing", "outlier", "normalize"]]
+DEFAULT_PREPROCESSING_VARIATIONS = [["missing", "outlier", "encode", "normalize"]]
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "data_processed"
 
 def split_data(dataframe, target_column=TARGET_COLUMN, test_size=TEST_SIZE, seed=RANDOM_SEED):
@@ -38,7 +38,7 @@ def _save_dataset(x, y, path):
     dataset.to_csv(path, index=False)
 
 
-def _apply_steps(x_train, x_test, steps):
+def _apply_steps(x_train, x_test, steps, missing_type="Cut", outlier_type="Clip"):
     processors = {
         "encode": encode_data,
         "missing": handle_missing_values,
@@ -49,15 +49,20 @@ def _apply_steps(x_train, x_test, steps):
     for step in steps:
         if step not in processors:
             raise ValueError(f"Unknown preprocessing step: {step}")
-        result = processors[step](x_train, x_test)
         
-        if result is not None:
-            x_train, x_test = result
+        if step == "missing":
+            result = processors[step](x_train, x_test, type=missing_type)
+        elif step == "outlier":
+            result = processors[step](x_train, x_test, type=outlier_type)
+        else:
+            result = processors[step](x_train, x_test)
+
+        x_train, x_test = result
 
     return x_train, x_test
 
 
-def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR):
+def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR, missing_type="Cut", outlier_type="Clip"):
     if preprocessing_variations is None:
         preprocessing_variations = [steps.copy() for steps in DEFAULT_PREPROCESSING_VARIATIONS]
     elif preprocessing_variations and isinstance(preprocessing_variations[0], str):
@@ -69,8 +74,8 @@ def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR):
     data = load_data()
     x_train, x_test, y_train, y_test = split_data(data, target_column=TARGET_COLUMN)
 
-    y_train = encode_target(y_train).reset_index(drop=True)
-    y_test = encode_target(y_test).reset_index(drop=True)
+    y_train = encode_target(y_train)
+    y_test = encode_target(y_test)
 
     _save_dataset(x_test, y_test, output_dir / "test_raw.csv")
 
@@ -78,9 +83,9 @@ def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR):
     for steps in preprocessing_variations:
         steps = list(steps)
         name = "_".join(steps) if steps else "raw"
-        train_x, test_x = _apply_steps(x_train.copy(), x_test.copy(), steps)
-        train_y = y_train.copy()
-        test_y = y_test.copy()
+        train_x, test_x = _apply_steps(x_train.copy(), x_test.copy(), steps, missing_type=missing_type, outlier_type=outlier_type)
+        train_y = y_train.copy().loc[train_x.index]
+        test_y = y_test.copy().loc[test_x.index]
 
         _save_dataset(train_x, train_y, output_dir / f"train_{name}.csv")
         _save_dataset(test_x, test_y, output_dir / f"test_{name}.csv")
