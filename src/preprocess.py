@@ -1,45 +1,38 @@
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler 
 
 
-def handle_missing_values(x_train, x_test, type="Cut"): #tipos: Cut, Media, Mediana, Moda
-    x_train = x_train.copy()
-    x_test = x_test.copy().reindex(columns=x_train.columns)
-
-    categorical_columns = x_train.select_dtypes( include=["object", "category", "bool", "string"]).columns
-    numeric_columns = x_train.select_dtypes(include="number").columns
-
-    if type == "Cut":
-        x_train= x_train.dropna() 
-        x_test = x_test.dropna()
-
-    if type in ["Media", "Mediana"]:
-        for column in numeric_columns:
-            if x_train[column].isna().any() or x_test[column].isna().any():
-                if type == "Media":
-                    value = x_train[column].mean()
-                else:
-                    value = x_train[column].median()
-
-                x_train[column] = x_train[column].fillna(value)
-                x_test[column] = x_test[column].fillna(value)
-
-    if type == "Moda":
-        columns_to_fill = x_train.columns
-    else:
-        columns_to_fill = categorical_columns
-
-    for column in columns_to_fill:
-        if x_train[column].isna().any() or x_test[column].isna().any():
-            modes = x_train[column].mode(dropna=True)
-
-            value = modes.iloc[0]
-            x_train[column] = x_train[column].fillna(value)
-            x_test[column] = x_test[column].fillna(value)
-
-    return x_train, x_test
+def _align(x_train, x_val, x_test):
+    cols = x_train.columns
+    return x_train.copy(), x_val.copy().reindex(columns=cols), x_test.copy().reindex(columns=cols)
 
 
+
+def _continuous_columns(x_train):
+    """Colunas numéricas com mais de 2 valores distintos.
+ 
+    Exclui binárias (ex.: SeniorCitizen e dummies do one-hot), que não
+    precisam de normalização.
+    """
+    numeric = x_train.select_dtypes(include="number").columns
+    return [c for c in numeric if x_train[c].nunique(dropna=True) > 2]
+ 
+
+
+def handle_missing_values(x_train, x_val, x_test, type="Zero"): #Zero  #Monthly 
+    x_train, x_val, x_test = _align(x_train, x_val, x_test)
+
+    # Regra de negócio específica para TotalCharges (clientes com tenure = 0)
+    if "TotalCharges" in x_train.columns:
+        for x in (x_train, x_val, x_test):
+            fill = 0.0 if type == "Zero" else x["MonthlyCharges"]
+            x["TotalCharges"] = x["TotalCharges"].fillna(fill)
+ 
+    return x_train, x_val, x_test
+
+
+
+'''''
 def handle_outliers(x_train, x_test, type="Clip"): #tipos: Clip, Cut
     x_train = x_train.copy()
     x_test = x_test.copy().reindex(columns=x_train.columns)
@@ -67,44 +60,45 @@ def handle_outliers(x_train, x_test, type="Clip"): #tipos: Clip, Cut
                 x_test[column].between(lower, upper) | x_test[column].isna()]
             
     return x_train, x_test
+'''
+
+# não seguem normal, só aplica nas 3 contínuas
+def normalize_data(x_train, x_val, x_test):
+    x_train, x_val, x_test = _align(x_train, x_val, x_test)
+    columns = _continuous_columns(x_train)
+    if not columns:
+        return x_train, x_val, x_test
+ 
+    for x in (x_train, x_val, x_test):
+        x[columns] = x[columns].astype("float64")
+
+    scaler = MinMaxScaler()
+    x_train[columns] = scaler.fit_transform(x_train[columns])
+    x_val[columns] = scaler.transform(x_val[columns])
+    x_test[columns] = scaler.transform(x_test[columns])
+    return x_train, x_val, x_test
 
 
-def normalize_data(x_train, x_test):
-    x_train = x_train.copy()
-    x_test = x_test.copy().reindex(columns=x_train.columns)
-    numeric_columns = x_train.select_dtypes(include="number").columns
 
-    if len(numeric_columns) == 0:
-        return x_train, x_test
-
-    scaler = StandardScaler()
-    x_train.loc[:, numeric_columns] = scaler.fit_transform(x_train[numeric_columns]) ## fit with x_train
-    x_test.loc[:, numeric_columns] = scaler.transform(x_test[numeric_columns]) ## same scaler learned from x_train
-    return x_train, x_test
-
-
-def encode_data(x_train, x_test):
-    x_train = x_train.copy()
-    x_test = x_test.copy().reindex(columns=x_train.columns)
+def encode_data(x_train, x_val, x_test):
+    x_train, x_val, x_test = _align(x_train, x_val, x_test)
     categorical_columns = x_train.select_dtypes(
-        include=["object", "category", "bool", "string"]
+        include=["object"] 
     ).columns
 
     if len(categorical_columns) == 0:
-        return x_train, x_test
+        return x_train, x_val, x_test
 
-    encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
-    train_encoded = encoder.fit_transform(x_train[categorical_columns]) ## fit with x_train
-    test_encoded = encoder.transform(x_test[categorical_columns]) ## same encoder learned from x_train
+
+    encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+    encoder.fit(x_train[categorical_columns])
     encoded_columns = encoder.get_feature_names_out(categorical_columns)
 
-    train_encoded = pd.DataFrame(
-        train_encoded, columns=encoded_columns, index=x_train.index
-    )
-    test_encoded = pd.DataFrame(
-        test_encoded, columns=encoded_columns, index=x_test.index
-    )
+    def transform(x):
+        encoded = pd.DataFrame(
+            encoder.transform(x[categorical_columns]), columns=encoded_columns, index=x.index
+        )
+        return pd.concat([x.drop(columns=categorical_columns), encoded], axis=1)
+ 
+    return transform(x_train), transform(x_val), transform(x_test)
 
-    x_train = x_train.drop(columns=categorical_columns).join(train_encoded)
-    x_test = x_test.drop(columns=categorical_columns).join(test_encoded)
-    return x_train, x_test

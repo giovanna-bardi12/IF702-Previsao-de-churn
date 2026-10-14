@@ -1,24 +1,18 @@
 from pathlib import Path
 
-from .data_loader import load_data
-from .preprocess import encode_data, handle_missing_values, handle_outliers, normalize_data
-from sklearn.model_selection import train_test_split
+from .data_loader import RANDOM_SEED, TARGET_COLUMN, load_data, split_data
+from .preprocess import encode_data, handle_missing_values, normalize_data
 
-TARGET_COLUMN = "Churn"
-TEST_SIZE = 0.2
-RANDOM_SEED = 42
-DEFAULT_PREPROCESSING_VARIATIONS = [["missing", "outlier", "encode", "normalize"]]
+
+DEFAULT_PREPROCESSING_VARIATIONS = [["missing", "encode", "normalize"]]
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "data_processed"
 
-def split_data(dataframe, target_column=TARGET_COLUMN, test_size=TEST_SIZE, seed=RANDOM_SEED):
-    x = dataframe.drop (columns = [target_column])
-    y = dataframe[target_column]
+PROCESSORS = {
+    "missing": handle_missing_values,
+    "encode": encode_data,
+    "normalize": normalize_data,
+}
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=test_size, random_state=seed, stratify=y
-    )
-
-    return x_train, x_test, y_train, y_test
 
 
 def encode_target(target):
@@ -28,6 +22,8 @@ def encode_target(target):
         .str.lower()
         .map({"no": 0, "yes": 1})
     )
+    if encoded.isna().any():
+        raise ValueError("Valores inesperados no alvo (esperado 'Yes'/'No')")
 
     return encoded.astype("int64")
 
@@ -38,33 +34,24 @@ def _save_dataset(x, y, path):
     dataset.to_csv(path, index=False)
 
 
-def _apply_steps(x_train, x_test, steps, missing_type="Cut", outlier_type="Clip"):
-    processors = {
-        "encode": encode_data,
-        "missing": handle_missing_values,
-        "outlier": handle_outliers,
-        "normalize": normalize_data,
-    }
-
+def _apply_steps(x_train, x_val,x_test, steps, missing_type="Zero"):
     for step in steps:
-        if step not in processors:
+        if step not in PROCESSORS:
             raise ValueError(f"Unknown preprocessing step: {step}")
         
         if step == "missing":
-            result = processors[step](x_train, x_test, type=missing_type)
-        elif step == "outlier":
-            result = processors[step](x_train, x_test, type=outlier_type)
+            result = PROCESSORS[step](x_train, x_val, x_test, type=missing_type)
         else:
-            result = processors[step](x_train, x_test)
+            result = PROCESSORS[step](x_train, x_val, x_test)
 
-        x_train, x_test = result
+        x_train,x_val ,x_test = result
 
-    return x_train, x_test
+    return x_train, x_val, x_test
 
 
-def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR, missing_type="Cut", outlier_type="Clip"):
+def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR,data_path=None, missing_type="Zero",seed=RANDOM_SEED):
     if preprocessing_variations is None:
-        preprocessing_variations = [steps.copy() for steps in DEFAULT_PREPROCESSING_VARIATIONS]
+        preprocessing_variations = [list(s) for s in DEFAULT_PREPROCESSING_VARIATIONS]
     elif preprocessing_variations and isinstance(preprocessing_variations[0], str):
         preprocessing_variations = [preprocessing_variations]
 
@@ -72,27 +59,33 @@ def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR, m
     output_dir.mkdir(parents=True, exist_ok=True)
 
     data = load_data()
-    x_train, x_test, y_train, y_test = split_data(data, target_column=TARGET_COLUMN)
+    x_train, x_val, x_test, y_train, y_val, y_test = split_data(data, target_column=TARGET_COLUMN, seed=seed)
 
     y_train = encode_target(y_train)
+    y_val = encode_target(y_val)
     y_test = encode_target(y_test)
 
-    _save_dataset(x_test, y_test, output_dir / "test_raw.csv")
+
+    # Conjuntos brutos (só divididos), úteis para conferência
+    for split, x, y in (("train", x_train, y_train), ("val", x_val, y_val), ("test", x_test, y_test)):
+        _save_dataset(x, y, output_dir / f"{split}_raw.csv")
+
 
     prepared = {}
     for steps in preprocessing_variations:
         steps = list(steps)
         name = "_".join(steps) if steps else "raw"
-        train_x, test_x = _apply_steps(x_train.copy(), x_test.copy(), steps, missing_type=missing_type, outlier_type=outlier_type)
-        train_y = y_train.copy().loc[train_x.index]
-        test_y = y_test.copy().loc[test_x.index]
 
-        _save_dataset(train_x, train_y, output_dir / f"train_{name}.csv")
-        _save_dataset(test_x, test_y, output_dir / f"test_{name}.csv")
-        prepared[name] = (train_x, test_x, train_y, test_y)
+        px_train, px_val, px_test = _apply_steps(
+            x_train, x_val, x_test, steps, missing_type=missing_type
+        )
 
+        for split, x, y in (("train", px_train, y_train), ("val", px_val, y_val), ("test", px_test, y_test)):
+            _save_dataset(x, y, output_dir / f"{split}_{name}.csv")
+ 
+        prepared[name] = (px_train, px_val, px_test, y_train, y_val, y_test)
+ 
     return prepared
-
 
 if __name__ == "__main__":
     prepare_data()
