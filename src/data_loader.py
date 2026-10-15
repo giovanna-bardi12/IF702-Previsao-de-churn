@@ -1,12 +1,16 @@
 from pathlib import Path
 
 import pandas as pd
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
+
 
 TARGET_COLUMN = "Churn"
 MAJORITY_LABEL = "No"   # Classe 1 (majoritária: não churn)
 MINORITY_LABEL = "Yes"  # Classe 2 (minoritária: churn)
 RANDOM_SEED = 42
+PROCESSED_DIR = Path(__file__).resolve().parents[1] / "data" / "data_processed"
 
 
 def load_data(data_path = None):
@@ -87,6 +91,29 @@ def data_loader(data_path=None, target_column=TARGET_COLUMN, seed=RANDOM_SEED):
     dataframe = load_data(data_path)
     return split_data(dataframe, target_column=target_column, seed=seed)
  
+def _csv_to_dataset(path, target_column=TARGET_COLUMN):
+    df = pd.read_csv(path)
+    x = torch.tensor(df.drop(columns=[target_column]).to_numpy(dtype="float32"))
+    y = torch.tensor(df[target_column].to_numpy(dtype="float32"))  # 0/1 para BCEWithLogitsLoss
+    return TensorDataset(x, y)
+ 
+ 
+def get_dataloaders(batch_size=128, data_dir=PROCESSED_DIR, num_workers=0):
+    """Lê train/val/test_<variation>.csv (gerados pelo prepare_data) e devolve DataLoaders.
+ 
+    Só o treino é embaralhado a cada época; validação e teste ficam na ordem fixa.
+    O número de features fica em train_loader.dataset.tensors[0].shape[1].
+    """
+    data_dir = Path(data_dir)
+    loaders = []
+    for split in ("train", "val", "test"):
+        path = data_dir / f"{split}_missing_encode_normalize.csv"
+        if not path.exists():
+            raise FileNotFoundError(f"{path} não existe. Rode antes: python -m src.prepare_data")
+        loaders.append(
+            DataLoader(_csv_to_dataset(path), batch_size=batch_size, shuffle=(split == "train"), num_workers=num_workers)
+        )
+    return tuple(loaders)
 
 
 def describe_split(y_train, y_val, y_test):
