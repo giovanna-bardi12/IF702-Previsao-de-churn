@@ -22,45 +22,48 @@ def _continuous_columns(x_train):
 def handle_missing_values(x_train, x_val, x_test, type="Zero"): #Zero  #Monthly 
     x_train, x_val, x_test = _align(x_train, x_val, x_test)
 
-    # Regra de negócio específica para TotalCharges (clientes com tenure = 0)
-    if "TotalCharges" in x_train.columns:
+    for column in x_train.columns:
+        if column == "TotalCharges" and type in ("Zero", "Monthly"):
+            # Regra de negócio: clientes novos ainda não acumularam cobranças.
+            if type == "Zero":
+                for x in (x_train, x_val, x_test):
+                    x[column] = x[column].fillna(0.0)
+            else:
+                for x in (x_train, x_val, x_test):
+                    x[column] = x[column].fillna(x["MonthlyCharges"])
+            continue
+
+        if pd.api.types.is_numeric_dtype(x_train[column]):
+            value = x_train[column].median()
+            if pd.isna(value):
+                value = 0
+        else:
+            modes = x_train[column].mode(dropna=True)
+            value = modes.iloc[0] if not modes.empty else "__missing__"
+
         for x in (x_train, x_val, x_test):
-            fill = 0.0 if type == "Zero" else x["MonthlyCharges"]
-            x["TotalCharges"] = x["TotalCharges"].fillna(fill)
+            x[column] = x[column].fillna(value)
  
     return x_train, x_val, x_test
 
 
+def handle_outliers(x_train, x_val, x_test, type="Clip"):
+    if type != "Clip":
+        raise ValueError("Only type='Clip' is supported to preserve row/label alignment")
 
-'''''
-def handle_outliers(x_train, x_test, type="Clip"): #tipos: Clip, Cut
-    x_train = x_train.copy()
-    x_test = x_test.copy().reindex(columns=x_train.columns)
-    numeric_columns = x_train.select_dtypes(include="number").columns
+    x_train, x_val, x_test = _align(x_train, x_val, x_test)
+    numeric_columns = _continuous_columns(x_train)
 
-    if len(numeric_columns) == 0:
-            return x_train, x_test
-
-    bounds = {}
     for column in numeric_columns:
         q1 = x_train[column].quantile(0.25)
         q3 = x_train[column].quantile(0.75)
         iqr = q3 - q1
-        bounds[column] = (q1 - 1.5 * iqr, q3 + 1.5 * iqr)
+        lower = q1 - 1.5 * iqr
+        upper = q3 + 1.5 * iqr
+        for x in (x_train, x_val, x_test):
+            x[column] = x[column].clip(lower=lower, upper=upper)
 
-    for column, (lower, upper) in bounds.items():
-        if type == "Clip":
-            x_train[column] = x_train[column].clip(lower=lower, upper=upper)
-            x_test[column] = x_test[column].clip(lower=lower, upper=upper)
-        if type == "Cut":
-            x_train = x_train[
-                x_train[column].between(lower, upper) | x_train[column].isna()]
-            
-            x_test = x_test[
-                x_test[column].between(lower, upper) | x_test[column].isna()]
-            
-    return x_train, x_test
-'''
+    return x_train, x_val, x_test
 
 # não seguem normal, só aplica nas 3 contínuas
 def normalize_data(x_train, x_val, x_test):
@@ -101,4 +104,3 @@ def encode_data(x_train, x_val, x_test):
         return pd.concat([x.drop(columns=categorical_columns), encoded], axis=1)
  
     return transform(x_train), transform(x_val), transform(x_test)
-

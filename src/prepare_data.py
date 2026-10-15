@@ -1,14 +1,15 @@
 from pathlib import Path
 
 from .data_loader import RANDOM_SEED, TARGET_COLUMN, load_data, split_data
-from .preprocess import encode_data, handle_missing_values, normalize_data
+from .preprocess import encode_data, handle_missing_values, handle_outliers, normalize_data
 
 
-DEFAULT_PREPROCESSING_VARIATIONS = [["missing", "encode", "normalize"]]
+DEFAULT_PREPROCESSING_VARIATIONS = [["missing", "outlier", "encode", "normalize"]]
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data" / "data_processed"
 
 PROCESSORS = {
     "missing": handle_missing_values,
+    "outlier": handle_outliers,
     "encode": encode_data,
     "normalize": normalize_data,
 }
