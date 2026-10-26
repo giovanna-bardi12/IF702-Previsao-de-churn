@@ -64,8 +64,8 @@ def objective(trial):
     ).to(device)
 
     run = wandb.init(
-        entity="Proj-IF702",
-        project="previsao-churn",
+         entity="zovkar-ufpe",
+        project="IF702-Projeto-Final",
         name=f"KAN_trial-{trial.number}_lr-{lr:.4f}_bs-{batch_size}",
         group="kan_optimization",
         config={**trial.params, "variation": VARIATION, "input_dim": input_dim},
