@@ -75,10 +75,14 @@ python -c "import torch; print('torch', torch.__version__, '| cuda:', torch.cuda
 # -------- pré-processamento
 #python -m src.prepare_data
 
-# -------- treino + validação (Optuna)
-python kan/kan_train.py
-
-# -------- teste
-#python kan/kan_test.py --top-k 5
-
+if [ "$STAGE" = "baseline" ]; then
+    # -------- baseline: treino com hiperparâmetros fixos + teste
+    python kan/kan_baseline.py
+    python kan/kan_test.py --baseline
+else
+    # -------- treino + validação (Optuna) + teste das 5 melhores trials
+    python kan/kan_train.py
+    python kan/kan_test.py --top-k 5
+fi
+ 
 echo "Finish"
