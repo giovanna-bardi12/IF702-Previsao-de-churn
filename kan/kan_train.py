@@ -47,9 +47,9 @@ def objective(trial):
     batch_size = trial.suggest_categorical("batch_size", [32, 64, 128, 256])
     weight_decay = trial.suggest_float("weight_decay", 1e-6, 1e-2, log=True)
 
-    num_hidden_layers = trial.suggest_categorical("num_hidden_layers", [1, 2, 3, 5])
+    num_hidden_layers = trial.suggest_categorical("num_hidden_layers", [1, 2, 3])
     hidden_dim = trial.suggest_categorical("hidden_dim", [4, 8, 16, 32, 64])
-    grid_size = trial.suggest_categorical("grid_size", [3, 5, 8, 10, 12])         # nº de intervalos da spline
+    grid_size = trial.suggest_categorical("grid_size", [3, 5, 8, 10])         # nº de intervalos da spline
     spline_order = trial.suggest_categorical("spline_order", [2, 3, 4])      
     activation_name = trial.suggest_categorical("activation", ["SiLU", "ReLU", "GELU"])  # função base
     reg_lambda = trial.suggest_float("reg_lambda", 1e-6, 1e-2, log=True)  # peso da regularização da KAN
