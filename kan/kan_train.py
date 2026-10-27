@@ -28,7 +28,7 @@ MAX_EPOCHS = 1000
 PATIENCE = 15
 LOSS_MIN_DELTA = 1e-4                   # melhora mínima na val_loss (BCE)
 KS_MIN_DELTA = 1e-3                     # melhora mínima no KS
-N_TRIALS = 150
+N_TRIALS = 200
 GRID_UPDATE_FREQ = 5     # atualiza o grid a cada 5 épocas...
 GRID_UPDATE_UNTIL = 50   # ...até a época 50; depois o grid fica fixo para o treino convergir
 
