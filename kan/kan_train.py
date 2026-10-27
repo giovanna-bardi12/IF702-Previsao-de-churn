@@ -28,7 +28,9 @@ MAX_EPOCHS = 1000
 PATIENCE = 15
 LOSS_MIN_DELTA = 1e-4                   # melhora mínima na val_loss (BCE)
 KS_MIN_DELTA = 1e-3                     # melhora mínima no KS
-N_TRIALS = 100
+N_TRIALS = 150
+GRID_UPDATE_FREQ = 5     # atualiza o grid a cada 5 épocas...
+GRID_UPDATE_UNTIL = 50   # ...até a época 50; depois o grid fica fixo para o treino convergir
 
 STUDY_NAME = f"kan-churn-{OBJECTIVE_METRIC}"
 
@@ -45,11 +47,12 @@ def objective(trial):
     batch_size = trial.suggest_categorical("batch_size", [32, 64, 128, 256])
     weight_decay = trial.suggest_float("weight_decay", 1e-6, 1e-2, log=True)
 
-    num_hidden_layers = trial.suggest_categorical("num_hidden_layers", [1, 2])
-    hidden_dim = trial.suggest_categorical("hidden_dim", [4, 8, 16, 32])
-    grid_size = trial.suggest_categorical("grid_size", [3, 5, 8])         # nº de intervalos da spline
-    spline_order = trial.suggest_categorical("spline_order", [2, 3])      # grau da spline (3 = cúbica)
+    num_hidden_layers = trial.suggest_categorical("num_hidden_layers", [1, 2, 3, 5])
+    hidden_dim = trial.suggest_categorical("hidden_dim", [4, 8, 16, 32, 64])
+    grid_size = trial.suggest_categorical("grid_size", [3, 5, 8, 10, 12])         # nº de intervalos da spline
+    spline_order = trial.suggest_categorical("spline_order", [2, 3, 4])      
     activation_name = trial.suggest_categorical("activation", ["SiLU", "ReLU", "GELU"])  # função base
+    reg_lambda = trial.suggest_float("reg_lambda", 1e-6, 1e-2, log=True)  # peso da regularização da KAN
 
     train_loader, val_loader, _ = get_dataloaders(batch_size=batch_size)
     input_dim = train_loader.dataset.tensors[0].shape[1]
@@ -60,7 +63,7 @@ def objective(trial):
         hidden_dim=hidden_dim,
         grid_size=grid_size,
         spline_order=spline_order,
-        activation_name=activation_name,
+        activation_name=activation_name
     ).to(device)
 
     run = wandb.init(
@@ -93,7 +96,8 @@ def objective(trial):
     best_loss_metrics, best_ks_metrics = None, None
 
     for epoch in range(max_epochs):
-        train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
+        update_grid = epoch < GRID_UPDATE_UNTIL and epoch % GRID_UPDATE_FREQ == 0
+        train_loss = train_epoch(model, train_loader, optimizer, criterion, device, reg_lambda=reg_lambda, update_grid=update_grid)
         val_loss, inference_time, labels, probs = validate_epoch(model, val_loader, criterion, device)
         inference_times.append(inference_time)
 

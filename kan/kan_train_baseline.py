@@ -25,7 +25,7 @@ from src.data_loader import get_dataloaders
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
 from models_kan import build_kan, train_epoch, validate_epoch
 # Mesmas configurações de treino do Optuna, para a comparação ser justa
-from kan_train import KS_MIN_DELTA, LOSS_MIN_DELTA, MAX_EPOCHS, PATIENCE, VARIATION
+from kan_train import  GRID_UPDATE_FREQ, GRID_UPDATE_UNTIL, KS_MIN_DELTA, LOSS_MIN_DELTA, MAX_EPOCHS, PATIENCE, VARIATION
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -40,7 +40,7 @@ BASELINE_PARAMS = {
     "grid_size": 5,
     "spline_order": 3,
     "activation": "SiLU",
-}
+    "reg_lambda": 0.0}
 SEED = 42
 
 BASELINE_DIR = MODEL_DIR / "baseline"
@@ -70,7 +70,7 @@ def main():
         hidden_dim=p["hidden_dim"],
         grid_size=p["grid_size"],
         spline_order=p["spline_order"],
-        activation_name=p["activation"],
+        activation_name=p["activation"]
     ).to(device)
     n_params = sum(t.numel() for t in model.parameters())
 
@@ -101,7 +101,9 @@ def main():
     best_loss_metrics, best_ks_metrics = None, None
 
     for epoch in range(max_epochs):
-        train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
+        update_grid = epoch < GRID_UPDATE_UNTIL and epoch % GRID_UPDATE_FREQ == 0
+        train_loss = train_epoch(model, train_loader, optimizer, criterion, device,
+                         reg_lambda=p["reg_lambda"], update_grid=update_grid)
         val_loss, inference_time, labels, probs = validate_epoch(model, val_loader, criterion, device)
         inference_times.append(inference_time)
 
