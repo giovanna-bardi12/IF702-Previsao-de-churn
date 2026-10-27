@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH --exclude=cluster-node[1,2,8,9,10]
 #SBATCH --job-name=churn-kan
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -22,7 +23,7 @@ function clean_up {
     sync_src="$cdir/$PROJECT"
     if [ -d "$sync_src" ]; then
         # Traz de volta: churn_optuna.db, wandb/ (checkpoints), test_results/, data/data_processed/
-        rsync -av --exclude='*__pycache__*' --exclude='slurm*' --exclude='.git' --exclude='venv' \
+        rsync -av --exclude='*__pycache__*' --exclude='slurm*' --exclude='job_error*' --exclude='.git' --exclude='venv' \
             "$sync_src/" ~/"$PROJECT"/
     else
         echo "Warning: '$sync_src' não existe, pulando rsync."
@@ -49,7 +50,7 @@ if [ ! -f ~/"$PROJECT"/data/data_raw/customer_churn_telecom_services.csv ]; then
 fi
 
 # Copia o projeto para o disco local do node (sem o venv local nem o .git)
-rsync -av --exclude='.nfs*' --exclude='venv' --exclude='.git' ~/"$PROJECT" .
+rsync -av --exclude='.nfs*' --exclude='venv' --exclude='slurm*' --exclude='.git' --exclude='job_error*' ~/"$PROJECT" .
 cd "$PROJECT"
 
 # O venv é criado uma vez no nó de login (junto com o "wandb login"), não dentro do job
@@ -75,14 +76,8 @@ python -c "import torch; print('torch', torch.__version__, '| cuda:', torch.cuda
 # -------- pré-processamento
 #python -m src.prepare_data
 
-if [ "$STAGE" = "baseline" ]; then
-    # -------- baseline: treino com hiperparâmetros fixos + teste
-    python kan/kan_baseline.py
-    python kan/kan_test.py --baseline
-else
-    # -------- treino + validação (Optuna) + teste das 5 melhores trials
-    python kan/kan_train.py
-    python kan/kan_test.py --top-k 5
-fi
+# -------- treino + validação (Optuna) + teste das 5 melhores trials
+python kan/kan_train.py
+# python kan/kan_test.py --top-k 5
  
 echo "Finish"

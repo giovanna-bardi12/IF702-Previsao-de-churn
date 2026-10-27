@@ -221,3 +221,7 @@ __marimo__/
 
 .venv
 data_processed*
+
+wandb/
+churn_optuna*
+baseline/
