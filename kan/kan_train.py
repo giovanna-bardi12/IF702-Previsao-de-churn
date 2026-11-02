@@ -18,6 +18,7 @@ import wandb
 
 from src.data_loader import get_dataloaders
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
+from src.run_tags import wandb_provenance_tags
 from models_kan import build_kan, train_epoch, validate_epoch
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -71,6 +72,16 @@ def objective(trial):
         project="IF702-Projeto-Final",
         name=f"KAN_trial-{trial.number}_lr-{lr:.4f}_bs-{batch_size}",
         group="kan_optimization",
+        tags=[
+            "model:kan",
+            "task:churn",
+            "stage:train",
+            "strategy:optuna",
+            f"data:{VARIATION}",
+            f"device:{device.type}",
+            f"objective:{OBJECTIVE_METRIC}",
+            *wandb_provenance_tags(),
+        ],
         config={**trial.params, "variation": VARIATION, "input_dim": input_dim},
         dir=str(MODEL_DIR),
         reinit=True,

@@ -225,3 +225,7 @@ data_processed*
 wandb/
 churn_optuna*
 baseline/
+mitra/wandb/
+mitra/baseline/
+mitra/test_results/
+mitra/churn_mitra_optuna.db*

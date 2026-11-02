@@ -12,6 +12,7 @@ set -e
 
 PROJECT=IF702-Previsao-de-churn
 VENV=~/churn_venv
+export GIT_COMMIT="$(git -C ~/$PROJECT rev-parse --short=12 HEAD 2>/dev/null || echo unknown)"
 
 cdir=${TMPDIR}/churn${SLURM_JOB_ID}
 mkdir -p "$cdir"

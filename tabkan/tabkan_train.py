@@ -15,6 +15,7 @@ import wandb
 
 from src.data_loader import get_dataloaders
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
+from src.run_tags import wandb_provenance_tags
 
 # Importa o wrapper e os loops diretamente de models_kan.py
 from models_tabkan import TabKANWrapper, train_epoch, validate_epoch
@@ -66,6 +67,16 @@ def objective(trial):
         project="IF702-Projeto-Final",
         name=f"TabKAN_trial-{trial.number}_lr-{lr:.4f}_bs-{batch_size}",
         group="tabkan_optimization",
+        tags=[
+            "model:tabkan",
+            "task:churn",
+            "stage:train",
+            "strategy:optuna",
+            f"data:{VARIATION}",
+            f"device:{device.type}",
+            f"objective:{OBJECTIVE_METRIC}",
+            *wandb_provenance_tags(),
+        ],
         config={**trial.params, "variation": VARIATION, "input_dim": input_dim},
         dir=str(MODEL_DIR),
         reinit=True,

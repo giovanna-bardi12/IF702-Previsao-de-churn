@@ -23,6 +23,7 @@ import wandb
 
 from src.data_loader import get_dataloaders
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
+from src.run_tags import wandb_provenance_tags
 from models_kan import build_kan, train_epoch, validate_epoch
 # Mesmas configurações de treino do Optuna, para a comparação ser justa
 from kan_train import  GRID_UPDATE_FREQ, GRID_UPDATE_UNTIL, KS_MIN_DELTA, LOSS_MIN_DELTA, MAX_EPOCHS, PATIENCE, VARIATION
@@ -79,6 +80,15 @@ def main():
         project="IF702-Projeto-Final",
         name="KAN_baseline",
         group="kan_baseline",
+        tags=[
+            "model:kan",
+            "task:churn",
+            "stage:train",
+            "strategy:baseline",
+            f"data:{VARIATION}",
+            f"device:{device.type}",
+            *wandb_provenance_tags(),
+        ],
         config={**p, "variation": VARIATION, "input_dim": input_dim, "seed": SEED, "n_params": n_params},
         dir=str(MODEL_DIR),
     )
