@@ -50,13 +50,14 @@ def _shuffle(df, seed):
     return df.sample(frac=1, random_state=seed).reset_index(drop=True)
 
  
-def split_data(dataframe, target_column=TARGET_COLUMN, seed=RANDOM_SEED):
+def split_data(dataframe, target_column=TARGET_COLUMN, seed=RANDOM_SEED, *,
+               oversample_train=True, oversample_val=True):
     """
     Classe 1 (majoritária) -> 50% treino | 25% validação | 25% teste
     Classe 2 (minoritária) -> 50% treino | 25% validação | 25% teste
  
-    - Treino:    Classe 1 (50%) + Classe 2 (50%) repetida até igualar a Classe 1
-    - Validação: Classe 1 (25%) + Classe 2 (25%) repetida até igualar a Classe 1
+    - Treino:    50% de cada classe, com oversampling opcional da classe minoritária
+    - Validação: 25% de cada classe, com oversampling opcional da classe minoritária
     - Teste:     Classe 1 (25%) + Classe 2 (25%) SEM repetição (distribuição real)
  
     """
@@ -71,8 +72,8 @@ def split_data(dataframe, target_column=TARGET_COLUMN, seed=RANDOM_SEED):
     maj_train, maj_val, maj_test = _split_class(majority, seed)
     min_train, min_val, min_test = _split_class(minority, seed)
  
-    train = pd.concat([maj_train, _oversample(min_train, len(maj_train), seed)])
-    val = pd.concat([maj_val, _oversample(min_val, len(maj_val), seed)])
+    train = pd.concat([maj_train, _oversample(min_train, len(maj_train), seed) if oversample_train else min_train])
+    val = pd.concat([maj_val, _oversample(min_val, len(maj_val), seed) if oversample_val else min_val])
     test = pd.concat([maj_test, min_test])
  
     train, val, test = (_shuffle(df, seed) for df in (train, val, test))

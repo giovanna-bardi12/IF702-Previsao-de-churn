@@ -49,7 +49,7 @@ def _apply_steps(x_train, x_val,x_test, steps, missing_type="Zero"):
     return x_train, x_val, x_test
 
 
-def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR,data_path=None, missing_type="Zero",seed=RANDOM_SEED):
+def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR,data_path=None, missing_type="Zero",seed=RANDOM_SEED, *, oversample_train=True, oversample_val=True):
     if preprocessing_variations is None:
         preprocessing_variations = [list(s) for s in DEFAULT_PREPROCESSING_VARIATIONS]
     elif preprocessing_variations and isinstance(preprocessing_variations[0], str):
@@ -58,8 +58,11 @@ def prepare_data(preprocessing_variations=None, output_dir=DEFAULT_OUTPUT_DIR,da
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    data = load_data()
-    x_train, x_val, x_test, y_train, y_val, y_test = split_data(data, target_column=TARGET_COLUMN, seed=seed)
+    data = load_data(data_path)
+    x_train, x_val, x_test, y_train, y_val, y_test = split_data(
+        data, target_column=TARGET_COLUMN, seed=seed,
+        oversample_train=oversample_train, oversample_val=oversample_val,
+    )
 
     y_train = encode_target(y_train)
     y_val = encode_target(y_val)

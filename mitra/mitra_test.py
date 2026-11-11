@@ -1,4 +1,4 @@
-"""Evaluate MITRA baseline or top Optuna trials on the held-out test split."""
+"""Evaluate the selected MITRA predictor on the held-out test split."""
 import argparse
 import json
 import sys
@@ -21,7 +21,7 @@ from mitra.mitra_train import STORAGE, STUDY_NAME
 from mitra.mitra_train_baseline import CONFIG_PATH
 
 
-RESULTS_DIR = MODEL_DIR / "test_results"
+RESULTS_DIR = MODEL_DIR / "test_results_natural_v2"
 
 
 def evaluate(path, test_df):
@@ -71,12 +71,12 @@ def test_baseline(test_df):
     return [row], RESULTS_DIR / "mitra_baseline_test_metrics.csv"
 
 
-def test_optuna(test_df, top_k=1):
+def test_optuna(test_df):
     study = optuna.load_study(study_name=STUDY_NAME, storage=STORAGE)
     complete = [trial for trial in study.trials if trial.state == optuna.trial.TrialState.COMPLETE]
     if not complete:
         raise RuntimeError("No completed MITRA trials. Run: python -m mitra.mitra_train")
-    trials = sorted(complete, key=lambda trial: trial.value, reverse=True)[:top_k]
+    trials = sorted(complete, key=lambda trial: trial.value, reverse=True)[:1]
 
     rows = []
     for rank, trial in enumerate(trials, 1):
@@ -89,17 +89,17 @@ def test_optuna(test_df, top_k=1):
     return rows, RESULTS_DIR / "mitra_test_metrics.csv"
 
 
-def main(top_k=1, baseline=False):
+def main(baseline=False):
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     _, _, test_df = load_splits()
-    rows, output_path = test_baseline(test_df) if baseline else test_optuna(test_df, top_k)
+    rows, output_path = test_baseline(test_df) if baseline else test_optuna(test_df)
     pd.DataFrame(rows).to_csv(output_path, index=False)
     print(f"Results saved to {output_path}")
 
     run = wandb.init(
         entity="zovkar-ufpe",
         project="IF702-Projeto-Final",
-        name="MITRA_test_baseline" if baseline else "MITRA_test_top_trials",
+        name="MITRA_test_baseline" if baseline else "MITRA_test_best_trial",
         group="mitra_test",
         tags=[
             "model:mitra",
@@ -108,10 +108,10 @@ def main(top_k=1, baseline=False):
             "strategy:baseline" if baseline else "strategy:optuna",
             f"data:{VARIATION}",
             f"device:{DEVICE}",
-            "evaluation:fixed-checkpoint" if baseline else "evaluation:top-k",
+            "evaluation:fixed-checkpoint" if baseline else "evaluation:best-validation",
             *wandb_provenance_tags(),
         ],
-        config={"baseline": baseline, "top_k": 1 if baseline else top_k},
+        config={"baseline": baseline},
         dir=str(MODEL_DIR),
         reinit=True,
     )
@@ -128,7 +128,6 @@ def main(top_k=1, baseline=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--top-k", type=int, default=1, help="Number of highest validation-KS trials to evaluate")
     parser.add_argument("--baseline", action="store_true", help="Evaluate the fixed fine-tuning baseline")
     args = parser.parse_args()
-    main(top_k=args.top_k, baseline=args.baseline)
+    main(baseline=args.baseline)

@@ -24,9 +24,9 @@ from mitra.common import (
 
 
 OBJECTIVE_METRIC = "ks"
-N_TRIALS = 30
+FINE_TUNE_STEPS = [0, 10, 25, 50, 100]
 FIT_TIME_LIMIT_SECONDS = 900
-STUDY_NAME = f"mitra-churn-{OBJECTIVE_METRIC}"
+STUDY_NAME = f"mitra-churn-natural-v2-{OBJECTIVE_METRIC}"
 STORAGE = f"sqlite:///{MODEL_DIR / 'churn_mitra_optuna.db'}"
 WANDB_ENTITY = "zovkar-ufpe"
 WANDB_PROJECT = "IF702-Projeto-Final"
@@ -37,8 +37,8 @@ def _relative(path):
 
 
 def objective(trial):
-    fine_tune = trial.suggest_categorical("fine_tune", [False, True])
-    fine_tune_steps = trial.suggest_categorical("fine_tune_steps", [10, 25, 50, 100]) if fine_tune else 0
+    fine_tune_steps = trial.suggest_categorical("fine_tune_steps", FINE_TUNE_STEPS)
+    fine_tune = fine_tune_steps > 0
     search_params = {
         "fine_tune": fine_tune,
         "fine_tune_steps": fine_tune_steps,
@@ -83,7 +83,7 @@ def objective(trial):
     try:
         fit_started = time.perf_counter()
         predictor = fit_predictor(
-            train_df, val_df, predictor_path, model_params,
+            train_df, predictor_path, model_params,
             time_limit=FIT_TIME_LIMIT_SECONDS,
         )
         fit_seconds = time.perf_counter() - fit_started
@@ -130,7 +130,7 @@ def print_top_trials(study, top_k=5):
     for rank, trial in enumerate(best_trials, 1):
         print(f"--- Top {rank} (Trial #{trial.number}) ---")
         print(f"Validation KS: {trial.value:.4f}")
-        print(f"Fine-tuning: {trial.params['fine_tune']} | steps: {trial.user_attrs['params']['fine_tune_steps']}")
+        print(f"Fine-tuning: {trial.user_attrs['params']['fine_tune']} | steps: {trial.user_attrs['params']['fine_tune_steps']}")
         print(f"Fit time: {trial.user_attrs['fit_time_seconds']:.2f} sec")
         for key in METRIC_NAMES:
             print(f"Val {key}: {trial.user_attrs[f'val_{key}']:.4f}")
@@ -142,8 +142,10 @@ if __name__ == "__main__":
         study_name=STUDY_NAME,
         storage=STORAGE,
         direction="maximize",
-        sampler=optuna.samplers.TPESampler(seed=42),
+        sampler=optuna.samplers.GridSampler({"fine_tune_steps": FINE_TUNE_STEPS}, seed=42),
         load_if_exists=True,
     )
-    study.optimize(objective, n_trials=N_TRIALS)
+    remaining = len(FINE_TUNE_STEPS) - len(study.trials)
+    if remaining > 0:
+        study.optimize(objective, n_trials=remaining)
     print_top_trials(study)

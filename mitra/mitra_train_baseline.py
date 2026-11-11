@@ -20,7 +20,7 @@ from mitra.common import (
 
 BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": 50}
 FIT_TIME_LIMIT_SECONDS = 900
-BASELINE_DIR = MODEL_DIR / "baseline"
+BASELINE_DIR = MODEL_DIR / "baseline_natural_v2"
 CONFIG_PATH = BASELINE_DIR / "config.json"
 
 
@@ -59,7 +59,7 @@ def main():
         predictor_path = Path(run.dir) / "mitra_predictor"
         fit_started = time.perf_counter()
         predictor = fit_predictor(
-            train_df, val_df, predictor_path, BASELINE_PARAMS,
+            train_df, predictor_path, BASELINE_PARAMS,
             time_limit=FIT_TIME_LIMIT_SECONDS,
         )
         fit_seconds = time.perf_counter() - fit_started
