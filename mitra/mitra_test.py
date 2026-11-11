@@ -17,7 +17,7 @@ from autogluon.tabular import TabularPredictor
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
 from src.run_tags import wandb_provenance_tags
 from mitra.common import DEVICE, MODEL_DIR, VARIATION, load_splits, positive_probabilities
-from mitra.mitra_train import STORAGE, STUDY_NAME
+from mitra.mitra_train import STORAGE, STUDY_DB_PATH, STUDY_NAME
 from mitra.mitra_train_baseline import CONFIG_PATH
 
 
@@ -72,7 +72,18 @@ def test_baseline(test_df):
 
 
 def test_optuna(test_df):
-    study = optuna.load_study(study_name=STUDY_NAME, storage=STORAGE)
+    missing_study_message = (
+        f"MITRA Optuna study {STUDY_NAME!r} was not found in {STUDY_DB_PATH}. "
+        "Run: python -m mitra.mitra_train. "
+        "To evaluate the baseline instead, run: python -m mitra.mitra_test --baseline. "
+        "If training ran in another session, restore its SQLite database and predictor files."
+    )
+    if not STUDY_DB_PATH.exists():
+        raise RuntimeError(missing_study_message)
+    try:
+        study = optuna.load_study(study_name=STUDY_NAME, storage=STORAGE)
+    except KeyError as exc:
+        raise RuntimeError(missing_study_message) from exc
     complete = [trial for trial in study.trials if trial.state == optuna.trial.TrialState.COMPLETE]
     if not complete:
         raise RuntimeError("No completed MITRA trials. Run: python -m mitra.mitra_train")
@@ -113,7 +124,6 @@ def main(baseline=False):
         ],
         config={"baseline": baseline},
         dir=str(MODEL_DIR),
-        reinit=True,
     )
     try:
         for row in rows:

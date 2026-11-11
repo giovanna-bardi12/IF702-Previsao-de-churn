@@ -19,7 +19,7 @@ from mitra.common import (
 
 
 BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": 50}
-FIT_TIME_LIMIT_SECONDS = 900
+FIT_TIME_LIMIT_SECONDS = None
 BASELINE_DIR = MODEL_DIR / "baseline_natural_v2"
 CONFIG_PATH = BASELINE_DIR / "config.json"
 
@@ -53,7 +53,6 @@ def main():
             "implementation": "AutoGluon MITRA",
         },
         dir=str(MODEL_DIR),
-        reinit=True,
     )
     try:
         predictor_path = Path(run.dir) / "mitra_predictor"
@@ -99,7 +98,7 @@ def main():
         CONFIG_PATH.write_text(json.dumps(config, indent=2))
 
         print("================ MITRA BASELINE (validation) ================")
-        print(f"Fine-tuning steps: {BASELINE_PARAMS['fine_tune_steps']}")
+        print(f"Requested fine-tuning steps: {BASELINE_PARAMS['fine_tune_steps']}")
         print(f"Fit time: {fit_seconds:.2f} sec")
         print(f"Validation inference time: {inference_seconds:.4f} sec for {len(val_df)} rows")
         for key in METRIC_NAMES:

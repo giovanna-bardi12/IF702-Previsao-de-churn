@@ -44,7 +44,7 @@ def make_predictor(path, *, verbosity=2):
     )
 
 
-def fit_predictor(train_df, path, params, *, time_limit=None, verbosity=2):
+def fit_predictor(train_df, path, params, *, time_limit=None, verbosity=3):
     """Fit MITRA using an internal holdout for early stopping, not model selection."""
     fit_df, early_stop_df = train_test_split(
         train_df, test_size=0.15, random_state=RANDOM_SEED,
@@ -55,6 +55,7 @@ def fit_predictor(train_df, path, params, *, time_limit=None, verbosity=2):
         train_data=fit_df,
         tuning_data=early_stop_df,
         hyperparameters={"MITRA": dict(params)},
+        presets="medium",
         fit_weighted_ensemble=False,
         num_gpus=NUM_GPUS,
         time_limit=time_limit,

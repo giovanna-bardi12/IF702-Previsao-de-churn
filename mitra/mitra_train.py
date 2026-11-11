@@ -25,9 +25,10 @@ from mitra.common import (
 
 OBJECTIVE_METRIC = "ks"
 FINE_TUNE_STEPS = [0, 10, 25, 50, 100]
-FIT_TIME_LIMIT_SECONDS = 900
-STUDY_NAME = f"mitra-churn-natural-v2-{OBJECTIVE_METRIC}"
-STORAGE = f"sqlite:///{MODEL_DIR / 'churn_mitra_optuna.db'}"
+FIT_TIME_LIMIT_SECONDS = None
+STUDY_NAME = f"mitra-churn-natural-v3-{OBJECTIVE_METRIC}"
+STUDY_DB_PATH = MODEL_DIR / "churn_mitra_optuna.db"
+STORAGE = f"sqlite:///{STUDY_DB_PATH}"
 WANDB_ENTITY = "zovkar-ufpe"
 WANDB_PROJECT = "IF702-Projeto-Final"
 
@@ -76,7 +77,6 @@ def objective(trial):
             "implementation": "AutoGluon MITRA",
         },
         dir=str(MODEL_DIR),
-        reinit=True,
     )
     # Use the active run directory so each trial keeps a self-contained predictor.
     predictor_path = Path(run.dir) / "mitra_predictor"
@@ -130,7 +130,7 @@ def print_top_trials(study, top_k=5):
     for rank, trial in enumerate(best_trials, 1):
         print(f"--- Top {rank} (Trial #{trial.number}) ---")
         print(f"Validation KS: {trial.value:.4f}")
-        print(f"Fine-tuning: {trial.user_attrs['params']['fine_tune']} | steps: {trial.user_attrs['params']['fine_tune_steps']}")
+        print(f"Fine-tuning: {trial.user_attrs['params']['fine_tune']} | requested steps: {trial.user_attrs['params']['fine_tune_steps']}")
         print(f"Fit time: {trial.user_attrs['fit_time_seconds']:.2f} sec")
         for key in METRIC_NAMES:
             print(f"Val {key}: {trial.user_attrs[f'val_{key}']:.4f}")

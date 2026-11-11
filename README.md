@@ -21,11 +21,23 @@ the splits for other models remain unchanged. Training reserves 15% of the
 training split for early stopping. The separate validation split selects among
 five configurations (no fine-tuning, or 10, 25, 50, or 100 steps). The saved
 predictor retains its training context for in-context inference. The new study
-and baseline have separate names from older experiments. The time limit and
-early stopping can result in fewer steps than requested; inspect the logs.
+and baseline have separate names from older experiments. Training uses verbose
+logging and no fixed time limit; early stopping can still result in fewer steps
+than requested. The v3 Optuna study is separate from the earlier time-limited
+v2 study, so trials with different training budgets are not mixed.
 
-Use the held-out test only after selecting a model. To evaluate the fixed
-baseline instead, use `python -m mitra.mitra_test --baseline`. Raw model scores
+On GPUs with limited memory, MITRA may retry with a smaller support set after
+an out-of-memory error; a GPU with more available memory can reduce retries.
+AutoGluon manages this fallback internally. To authenticate Hugging Face model
+downloads, set `HF_TOKEN` in the environment (for example, using Kaggle Secrets).
+Authentication is optional for the public model but can improve download limits.
+
+Use the held-out test only after selecting a model. Baseline training does not
+create an Optuna study: to test that run, use
+`python -m mitra.mitra_test --baseline`. The default test command requires a
+completed `python -m mitra.mitra_train` run. In a new Kaggle session, restore
+the Optuna SQLite database and the referenced predictor files, or rerun the
+training. Raw model scores
 are not guaranteed to be calibrated churn probabilities; assess and, if needed,
 calibrate them on separate data before using them as probabilities.
 
