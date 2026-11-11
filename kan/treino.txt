@@ -1,0 +1,319 @@
+arly stopping na época 17 (melhor loss: época 1 | melhor KS: época 2)
+Early stopping na época 27 (melhor loss: época 12 | melhor KS: época 8)
+Early stopping na época 28 (melhor loss: época 4 | melhor KS: época 13)
+Early stopping na época 64 (melhor loss: época 30 | melhor KS: época 49)
+Early stopping na época 19 (melhor loss: época 4 | melhor KS: época 3)
+Early stopping na época 20 (melhor loss: época 2 | melhor KS: época 5)
+Early stopping na época 27 (melhor loss: época 2 | melhor KS: época 12)
+Early stopping na época 70 (melhor loss: época 55 | melhor KS: época 47)
+Early stopping na época 23 (melhor loss: época 8 | melhor KS: época 6)
+Early stopping na época 33 (melhor loss: época 16 | melhor KS: época 18)
+Early stopping na época 17 (melhor loss: época 1 | melhor KS: época 2)
+Early stopping na época 24 (melhor loss: época 2 | melhor KS: época 9)
+Early stopping na época 19 (melhor loss: época 3 | melhor KS: época 4)
+Early stopping na época 24 (melhor loss: época 7 | melhor KS: época 9)
+Early stopping na época 39 (melhor loss: época 14 | melhor KS: época 24)
+Early stopping na época 68 (melhor loss: época 53 | melhor KS: época 43)
+Early stopping na época 42 (melhor loss: época 27 | melhor KS: época 22)
+Early stopping na época 25 (melhor loss: época 10 | melhor KS: época 6)
+Early stopping na época 20 (melhor loss: época 5 | melhor KS: época 3)
+Early stopping na época 31 (melhor loss: época 16 | melhor KS: época 9)
+Early stopping na época 59 (melhor loss: época 34 | melhor KS: época 44)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 18)
+Early stopping na época 29 (melhor loss: época 14 | melhor KS: época 9)
+Early stopping na época 121 (melhor loss: época 106 | melhor KS: época 44)
+Early stopping na época 24 (melhor loss: época 6 | melhor KS: época 9)
+Early stopping na época 130 (melhor loss: época 115 | melhor KS: época 68)
+Early stopping na época 23 (melhor loss: época 7 | melhor KS: época 8)
+Early stopping na época 63 (melhor loss: época 48 | melhor KS: época 16)
+Early stopping na época 37 (melhor loss: época 21 | melhor KS: época 22)
+Early stopping na época 83 (melhor loss: época 40 | melhor KS: época 68)
+Early stopping na época 19 (melhor loss: época 4 | melhor KS: época 3)
+Early stopping na época 73 (melhor loss: época 32 | melhor KS: época 58)
+Early stopping na época 109 (melhor loss: época 74 | melhor KS: época 94)
+Early stopping na época 28 (melhor loss: época 7 | melhor KS: época 13)
+Early stopping na época 82 (melhor loss: época 49 | melhor KS: época 67)
+Early stopping na época 35 (melhor loss: época 19 | melhor KS: época 20)
+Early stopping na época 26 (melhor loss: época 11 | melhor KS: época 9)
+Early stopping na época 37 (melhor loss: época 18 | melhor KS: época 22)
+Early stopping na época 38 (melhor loss: época 20 | melhor KS: época 23)
+Early stopping na época 44 (melhor loss: época 29 | melhor KS: época 24)
+Early stopping na época 23 (melhor loss: época 8 | melhor KS: época 6)
+Early stopping na época 44 (melhor loss: época 29 | melhor KS: época 19)
+Early stopping na época 103 (melhor loss: época 88 | melhor KS: época 85)
+Early stopping na época 31 (melhor loss: época 16 | melhor KS: época 11)
+Early stopping na época 33 (melhor loss: época 17 | melhor KS: época 18)
+Early stopping na época 24 (melhor loss: época 9 | melhor KS: época 9)
+Early stopping na época 27 (melhor loss: época 12 | melhor KS: época 9)
+Early stopping na época 73 (melhor loss: época 57 | melhor KS: época 58)
+Early stopping na época 29 (melhor loss: época 14 | melhor KS: época 10)
+Early stopping na época 65 (melhor loss: época 50 | melhor KS: época 34)
+Early stopping na época 53 (melhor loss: época 38 | melhor KS: época 24)
+Early stopping na época 25 (melhor loss: época 9 | melhor KS: época 10)
+Early stopping na época 121 (melhor loss: época 106 | melhor KS: época 54)
+Early stopping na época 26 (melhor loss: época 11 | melhor KS: época 9)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 17)
+Early stopping na época 32 (melhor loss: época 10 | melhor KS: época 17)
+Early stopping na época 64 (melhor loss: época 35 | melhor KS: época 49)
+Early stopping na época 69 (melhor loss: época 44 | melhor KS: época 54)
+Early stopping na época 27 (melhor loss: época 7 | melhor KS: época 12)
+Early stopping na época 22 (melhor loss: época 7 | melhor KS: época 7)
+Early stopping na época 43 (melhor loss: época 26 | melhor KS: época 28)
+Early stopping na época 34 (melhor loss: época 19 | melhor KS: época 17)
+Early stopping na época 101 (melhor loss: época 62 | melhor KS: época 86)
+Early stopping na época 105 (melhor loss: época 90 | melhor KS: época 69)
+Early stopping na época 49 (melhor loss: época 33 | melhor KS: época 34)
+Early stopping na época 61 (melhor loss: época 46 | melhor KS: época 35)
+Early stopping na época 30 (melhor loss: época 15 | melhor KS: época 8)
+Early stopping na época 71 (melhor loss: época 56 | melhor KS: época 36)
+Early stopping na época 24 (melhor loss: época 9 | melhor KS: época 7)
+Early stopping na época 106 (melhor loss: época 68 | melhor KS: época 91)
+Early stopping na época 24 (melhor loss: época 9 | melhor KS: época 7)
+Early stopping na época 71 (melhor loss: época 56 | melhor KS: época 25)
+Early stopping na época 53 (melhor loss: época 28 | melhor KS: época 38)
+Early stopping na época 37 (melhor loss: época 20 | melhor KS: época 22)
+Early stopping na época 94 (melhor loss: época 79 | melhor KS: época 79)
+Early stopping na época 70 (melhor loss: época 55 | melhor KS: época 54)
+Early stopping na época 24 (melhor loss: época 6 | melhor KS: época 9)
+Early stopping na época 74 (melhor loss: época 59 | melhor KS: época 41)
+Early stopping na época 64 (melhor loss: época 33 | melhor KS: época 49)
+Early stopping na época 28 (melhor loss: época 12 | melhor KS: época 13)
+Early stopping na época 22 (melhor loss: época 7 | melhor KS: época 4)
+Early stopping na época 94 (melhor loss: época 71 | melhor KS: época 79)
+Early stopping na época 82 (melhor loss: época 62 | melhor KS: época 67)
+Early stopping na época 40 (melhor loss: época 25 | melhor KS: época 23)
+Early stopping na época 27 (melhor loss: época 12 | melhor KS: época 10)
+Early stopping na época 62 (melhor loss: época 47 | melhor KS: época 30)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 18)
+Early stopping na época 102 (melhor loss: época 87 | melhor KS: época 44)
+Early stopping na época 30 (melhor loss: época 11 | melhor KS: época 15)
+Early stopping na época 43 (melhor loss: época 28 | melhor KS: época 24)
+Early stopping na época 42 (melhor loss: época 27 | melhor KS: época 20)
+Early stopping na época 25 (melhor loss: época 10 | melhor KS: época 7)
+Early stopping na época 88 (melhor loss: época 73 | melhor KS: época 51)
+Early stopping na época 29 (melhor loss: época 14 | melhor KS: época 8)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 18)
+Early stopping na época 33 (melhor loss: época 17 | melhor KS: época 18)
+Early stopping na época 22 (melhor loss: época 6 | melhor KS: época 7)
+Early stopping na época 22 (melhor loss: época 7 | melhor KS: época 7)
+Early stopping na época 21 (melhor loss: época 6 | melhor KS: época 4)
+Early stopping na época 81 (melhor loss: época 63 | melhor KS: época 66)
+Early stopping na época 51 (melhor loss: época 36 | melhor KS: época 21)
+Early stopping na época 38 (melhor loss: época 9 | melhor KS: época 23)
+Early stopping na época 36 (melhor loss: época 21 | melhor KS: época 16)
+Early stopping na época 21 (melhor loss: época 6 | melhor KS: época 3)
+Early stopping na época 36 (melhor loss: época 10 | melhor KS: época 21)
+Early stopping na época 24 (melhor loss: época 9 | melhor KS: época 5)
+Early stopping na época 43 (melhor loss: época 26 | melhor KS: época 28)
+Early stopping na época 100 (melhor loss: época 85 | melhor KS: época 54)
+Early stopping na época 19 (melhor loss: época 3 | melhor KS: época 4)
+Early stopping na época 68 (melhor loss: época 53 | melhor KS: época 37)
+Early stopping na época 27 (melhor loss: época 10 | melhor KS: época 12)
+Early stopping na época 22 (melhor loss: época 5 | melhor KS: época 7)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 15)
+Early stopping na época 37 (melhor loss: época 22 | melhor KS: época 17)
+Early stopping na época 47 (melhor loss: época 32 | melhor KS: época 22)
+Early stopping na época 26 (melhor loss: época 11 | melhor KS: época 10)
+Early stopping na época 49 (melhor loss: época 34 | melhor KS: época 23)
+Early stopping na época 71 (melhor loss: época 56 | melhor KS: época 52)
+Early stopping na época 99 (melhor loss: época 84 | melhor KS: época 68)
+Early stopping na época 32 (melhor loss: época 17 | melhor KS: época 17)
+Early stopping na época 76 (melhor loss: época 61 | melhor KS: época 56)
+Early stopping na época 26 (melhor loss: época 8 | melhor KS: época 11)
+Early stopping na época 61 (melhor loss: época 46 | melhor KS: época 31)
+Early stopping na época 47 (melhor loss: época 32 | melhor KS: época 22)
+Early stopping na época 34 (melhor loss: época 19 | melhor KS: época 19)
+Early stopping na época 29 (melhor loss: época 13 | melhor KS: época 14)
+Early stopping na época 44 (melhor loss: época 18 | melhor KS: época 29)
+Early stopping na época 28 (melhor loss: época 8 | melhor KS: época 13)
+Early stopping na época 24 (melhor loss: época 9 | melhor KS: época 5)
+Early stopping na época 48 (melhor loss: época 33 | melhor KS: época 31)
+Early stopping na época 47 (melhor loss: época 32 | melhor KS: época 27)
+Early stopping na época 48 (melhor loss: época 33 | melhor KS: época 27)
+Early stopping na época 28 (melhor loss: época 13 | melhor KS: época 12)
+Early stopping na época 42 (melhor loss: época 23 | melhor KS: época 27)
+Early stopping na época 40 (melhor loss: época 25 | melhor KS: época 18)
+Early stopping na época 87 (melhor loss: época 72 | melhor KS: época 33)
+Early stopping na época 22 (melhor loss: época 7 | melhor KS: época 7)
+Early stopping na época 46 (melhor loss: época 24 | melhor KS: época 31)
+Early stopping na época 32 (melhor loss: época 15 | melhor KS: época 17)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 18)
+Early stopping na época 57 (melhor loss: época 42 | melhor KS: época 32)
+Early stopping na época 24 (melhor loss: época 8 | melhor KS: época 9)
+Early stopping na época 114 (melhor loss: época 69 | melhor KS: época 99)
+Early stopping na época 22 (melhor loss: época 5 | melhor KS: época 7)
+Early stopping na época 65 (melhor loss: época 47 | melhor KS: época 50)
+Early stopping na época 78 (melhor loss: época 50 | melhor KS: época 63)
+Early stopping na época 82 (melhor loss: época 64 | melhor KS: época 67)
+Early stopping na época 79 (melhor loss: época 62 | melhor KS: época 64)
+Early stopping na época 27 (melhor loss: época 11 | melhor KS: época 12)
+Early stopping na época 126 (melhor loss: época 111 | melhor KS: época 101)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 18)
+Early stopping na época 57 (melhor loss: época 42 | melhor KS: época 40)
+Early stopping na época 27 (melhor loss: época 12 | melhor KS: época 11)
+Early stopping na época 73 (melhor loss: época 50 | melhor KS: época 58)
+Early stopping na época 42 (melhor loss: época 27 | melhor KS: época 19)
+Early stopping na época 34 (melhor loss: época 18 | melhor KS: época 19)
+Early stopping na época 28 (melhor loss: época 13 | melhor KS: época 13)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 17)
+Early stopping na época 59 (melhor loss: época 41 | melhor KS: época 44)
+Early stopping na época 65 (melhor loss: época 50 | melhor KS: época 47)
+Early stopping na época 22 (melhor loss: época 5 | melhor KS: época 7)
+Early stopping na época 31 (melhor loss: época 16 | melhor KS: época 14)
+Early stopping na época 20 (melhor loss: época 5 | melhor KS: época 5)
+Early stopping na época 74 (melhor loss: época 59 | melhor KS: época 37)
+Early stopping na época 106 (melhor loss: época 91 | melhor KS: época 37)
+Early stopping na época 72 (melhor loss: época 57 | melhor KS: época 56)
+Early stopping na época 46 (melhor loss: época 31 | melhor KS: época 27)
+Early stopping na época 41 (melhor loss: época 19 | melhor KS: época 26)
+Early stopping na época 26 (melhor loss: época 11 | melhor KS: época 11)
+Early stopping na época 30 (melhor loss: época 13 | melhor KS: época 15)
+Early stopping na época 95 (melhor loss: época 71 | melhor KS: época 80)
+Early stopping na época 44 (melhor loss: época 13 | melhor KS: época 29)
+Early stopping na época 29 (melhor loss: época 14 | melhor KS: época 12)
+Early stopping na época 68 (melhor loss: época 53 | melhor KS: época 26)
+Early stopping na época 25 (melhor loss: época 10 | melhor KS: época 10)
+Early stopping na época 65 (melhor loss: época 50 | melhor KS: época 50)
+Early stopping na época 31 (melhor loss: época 15 | melhor KS: época 16)
+Early stopping na época 59 (melhor loss: época 44 | melhor KS: época 39)
+Early stopping na época 35 (melhor loss: época 20 | melhor KS: época 20)
+Early stopping na época 30 (melhor loss: época 11 | melhor KS: época 15)
+Early stopping na época 105 (melhor loss: época 87 | melhor KS: época 90)
+Early stopping na época 25 (melhor loss: época 7 | melhor KS: época 10)
+Early stopping na época 59 (melhor loss: época 44 | melhor KS: época 33)
+Early stopping na época 23 (melhor loss: época 8 | melhor KS: época 7)
+Early stopping na época 26 (melhor loss: época 10 | melhor KS: época 11)
+Early stopping na época 22 (melhor loss: época 7 | melhor KS: época 5)
+Early stopping na época 61 (melhor loss: época 46 | melhor KS: época 26)
+Early stopping na época 34 (melhor loss: época 19 | melhor KS: época 14)
+Early stopping na época 20 (melhor loss: época 5 | melhor KS: época 3)
+Early stopping na época 66 (melhor loss: época 51 | melhor KS: época 21)
+Early stopping na época 149 (melhor loss: época 134 | melhor KS: época 120)
+Early stopping na época 23 (melhor loss: época 8 | melhor KS: época 4)
+Early stopping na época 92 (melhor loss: época 71 | melhor KS: época 77)
+Early stopping na época 64 (melhor loss: época 45 | melhor KS: época 49)
+Early stopping na época 25 (melhor loss: época 10 | melhor KS: época 5)
+Early stopping na época 26 (melhor loss: época 11 | melhor KS: época 8)
+Early stopping na época 54 (melhor loss: época 39 | melhor KS: época 32)
+Early stopping na época 33 (melhor loss: época 18 | melhor KS: época 16)
+Early stopping na época 32 (melhor loss: época 17 | melhor KS: época 11)
+Early stopping na época 111 (melhor loss: época 95 | melhor KS: época 96)
+
+
+================ TOP 5 MELHORES MODELOS (validação) ================
+
+--- Top 1 (Trial #62) ---
+Melhor KS na época 86 | menor val_loss na época 62
+Val ks: 0.5808
+Val roc_auc: 0.8575
+Val mse: 0.1541
+Val binary_cross_entropy: 0.4679
+Val accuracy: 0.7807
+Val precision: 0.7788
+Val recall: 0.7842
+Val f1: 0.7815
+Average Inference Time: 0.001282 sec/batch
+Hyperparameters:
+  - lr: 0.00012601180731906572
+  - batch_size: 64
+  - weight_decay: 0.0012897066763885333
+  - num_hidden_layers: 2
+  - hidden_dim: 16
+  - grid_size: 5
+  - spline_order: 2
+  - activation: SiLU
+  - reg_lambda: 0.00022320378710226823
+--------------------------------------------------
+
+--- Top 2 (Trial #142) ---
+Melhor KS na época 99 | menor val_loss na época 69
+Val ks: 0.5754
+Val roc_auc: 0.8576
+Val mse: 0.1539
+Val binary_cross_entropy: 0.4686
+Val accuracy: 0.7819
+Val precision: 0.7759
+Val recall: 0.7927
+Val f1: 0.7842
+Average Inference Time: 0.001242 sec/batch
+Hyperparameters:
+  - lr: 0.00014535058777228848
+  - batch_size: 64
+  - weight_decay: 0.0033953612054741953
+  - num_hidden_layers: 2
+  - hidden_dim: 16
+  - grid_size: 5
+  - spline_order: 2
+  - activation: ReLU
+  - reg_lambda: 0.00010382922556959112
+--------------------------------------------------
+
+--- Top 3 (Trial #171) ---
+Melhor KS na época 29 | menor val_loss na época 13
+Val ks: 0.5754
+Val roc_auc: 0.8536
+Val mse: 0.1562
+Val binary_cross_entropy: 0.4762
+Val accuracy: 0.7846
+Val precision: 0.7503
+Val recall: 0.8531
+Val f1: 0.7984
+Average Inference Time: 0.001612 sec/batch
+Hyperparameters:
+  - lr: 0.0010839416927454055
+  - batch_size: 64
+  - weight_decay: 0.005158636159462617
+  - num_hidden_layers: 3
+  - hidden_dim: 16
+  - grid_size: 5
+  - spline_order: 2
+  - activation: ReLU
+  - reg_lambda: 2.4001950823569282e-05
+--------------------------------------------------
+
+--- Top 4 (Trial #170) ---
+Melhor KS na época 80 | menor val_loss na época 71
+Val ks: 0.5739
+Val roc_auc: 0.8571
+Val mse: 0.1542
+Val binary_cross_entropy: 0.4703
+Val accuracy: 0.7645
+Val precision: 0.7643
+Val recall: 0.7649
+Val f1: 0.7646
+Average Inference Time: 0.001268 sec/batch
+Hyperparameters:
+  - lr: 0.000153764465471058
+  - batch_size: 64
+  - weight_decay: 0.004734468371702286
+  - num_hidden_layers: 2
+  - hidden_dim: 16
+  - grid_size: 5
+  - spline_order: 2
+  - activation: ReLU
+  - reg_lambda: 0.00012811468203408692
+--------------------------------------------------
+
+--- Top 5 (Trial #55) ---
+Melhor KS na época 17 | menor val_loss na época 10
+Val ks: 0.5731
+Val roc_auc: 0.8563
+Val mse: 0.1566
+Val binary_cross_entropy: 0.4771
+Val accuracy: 0.7672
+Val precision: 0.7858
+Val recall: 0.7347
+Val f1: 0.7594
+Average Inference Time: 0.001586 sec/batch
+Hyperparameters:
+  - lr: 0.0006097210012818074
+  - batch_size: 64
+  - weight_decay: 0.0011423773705672802
+  - num_hidden_layers: 3
+  - hidden_dim: 16
+  - grid_size: 5
+  - spline_order: 2
+  - activation: ReLU
+  - reg_lambda: 6.320377885875147e-06
+--------------------------------------------------
+

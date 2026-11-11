@@ -1,0 +1,128 @@
+BASELINE
+
+
+python kan/kan_test.py --baseline
+================ TESTE: KAN baseline (checkpoint 'ks') ================
+Val KS (seleção): 0.5607
+Test loss (BCE): 0.4894
+Test ks: 0.5390
+Test roc_auc: 0.8444
+Test mse: 0.1631
+Test binary_cross_entropy: 0.4894
+Test accuracy: 0.7565
+Test precision: 0.5280
+Test recall: 0.7863
+Test f1: 0.6318
+Tempo médio de inferência: 0.003977 s/batch
+Matriz de confusão:
+ [[965 329]
+ [100 368]] 
+
+Resultados salvos em /home/ju/Desktop/redes_neurais/IF702-Previsao-de-churn/kan/test_results/kan_baseline_test_metrics_ks.csv
+
+
+
+TUNAGEM
+
+sent 47,420,675 bytes  received 55,130 bytes  3,062,955.16 bytes/sec
+total size is 47,163,789  speedup is 0.99
+No devices were found
+Sem GPU visível, rodando em CPU.
+torch 2.14.1+cu130 | cuda: False
+================ TESTE: Top 1 (Trial #62, checkpoint 'ks') ================
+Val KS (seleção): 0.5808
+Test loss (BCE): 0.4806
+Test ks: 0.5437
+Test roc_auc: 0.8444
+Test mse: 0.1599
+Test binary_cross_entropy: 0.4806
+Test accuracy: 0.7594
+Test precision: 0.5331
+Test recall: 0.7564
+Test f1: 0.6254
+Tempo médio de inferência: 0.023030 s/batch
+Matriz de confusão:
+ [[984 310]
+ [114 354]] 
+
+================ TESTE: Top 2 (Trial #142, checkpoint 'ks') ================
+Val KS (seleção): 0.5754
+Test loss (BCE): 0.4846
+Test ks: 0.5459
+Test roc_auc: 0.8431
+Test mse: 0.1608
+Test binary_cross_entropy: 0.4846
+Test accuracy: 0.7645
+Test precision: 0.5395
+Test recall: 0.7735
+Test f1: 0.6356
+Tempo médio de inferência: 0.001077 s/batch
+Matriz de confusão:
+ [[985 309]
+ [106 362]] 
+
+================ TESTE: Top 3 (Trial #171, checkpoint 'ks') ================
+Val KS (seleção): 0.5754
+Test loss (BCE): 0.5197
+Test ks: 0.5404
+Test roc_auc: 0.8409
+Test mse: 0.1752
+Test binary_cross_entropy: 0.5197
+Test accuracy: 0.7412
+Test precision: 0.5080
+Test recall: 0.8184
+Test f1: 0.6268
+Tempo médio de inferência: 0.001257 s/batch
+Matriz de confusão:
+ [[923 371]
+ [ 85 383]] 
+
+================ TESTE: Top 4 (Trial #170, checkpoint 'ks') ================
+Val KS (seleção): 0.5739
+Test loss (BCE): 0.4865
+Test ks: 0.5437
+Test roc_auc: 0.8441
+Test mse: 0.1623
+Test binary_cross_entropy: 0.4865
+Test accuracy: 0.7622
+Test precision: 0.5356
+Test recall: 0.7885
+Test f1: 0.6379
+Tempo médio de inferência: 0.000990 s/batch
+Matriz de confusão:
+ [[974 320]
+ [ 99 369]] 
+
+================ TESTE: Top 5 (Trial #55, checkpoint 'ks') ================
+Val KS (seleção): 0.5731
+Test loss (BCE): 0.4598
+Test ks: 0.5360
+Test roc_auc: 0.8383
+Test mse: 0.1524
+Test binary_cross_entropy: 0.4598
+Test accuracy: 0.7701
+Test precision: 0.5519
+Test recall: 0.7158
+Test f1: 0.6233
+Tempo médio de inferência: 0.001266 s/batch
+Matriz de confusão:
+ [[1022  272]
+ [ 133  335]] 
+
+Resultados salvos em /tmp/churn18862/IF702-Previsao-de-churn/kan/test_results/kan_test_metrics_ks.csv
+Finish
+>> Sincronizando resultados de volta para a home e limpando o node...
+sending incremental file list
+kan/
+kan/test_results/
+kan/test_results/confusion_matrix_kan_trial142_ks.png
+kan/test_results/confusion_matrix_kan_trial170_ks.png
+kan/test_results/confusion_matrix_kan_trial171_ks.png
+kan/test_results/confusion_matrix_kan_trial55_ks.png
+kan/test_results/confusion_matrix_kan_trial62_ks.png
+kan/test_results/kan_test_metrics_ks.csv
+src/
+
+sent 278,831 bytes  received 1,573 bytes  186,936.00 bytes/sec
+total size is 47,286,121  speedup is 168.64
+>> Limpeza concluída.
