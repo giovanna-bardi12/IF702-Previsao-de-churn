@@ -5,7 +5,7 @@
 MITRA is integrated through AutoGluon's official tabular implementation. It
 uses MITRA's pretrained weights and supports zero-shot inference and optional
 fine-tuning; the Optuna search compares zero-shot runs with several fine-tuning
-step counts. The first run may need internet access to download the pretrained
+settings. The first run may need internet access to download the pretrained
 checkpoint from Hugging Face. A GPU is strongly recommended for fine-tuning.
 
 ```bash
@@ -18,13 +18,27 @@ python -m mitra.mitra_test
 
 MITRA uses its own prepared splits, preserving the original class proportions;
 the splits for other models remain unchanged. Training reserves 15% of the
-training split for early stopping. The separate validation split selects among
-five configurations (no fine-tuning, or 10, 25, 50, or 100 steps). The saved
-predictor retains its training context for in-context inference. The new study
-and baseline have separate names from older experiments. Training uses verbose
-logging and no fixed time limit; early stopping can still result in fewer steps
-than requested. The v3 Optuna study is separate from the earlier time-limited
-v2 study, so trials with different training budgets are not mixed.
+training split for early stopping. The separate validation split selects the
+trial with the highest KS. The saved predictor retains its training context
+for in-context inference. Training uses verbose logging and no fixed time limit;
+early stopping can still result in fewer steps than requested.
+
+The v6 Optuna study is separate from earlier studies. It starts with a zero-shot
+trial and the fixed fine-tuning baseline, then uses TPE to search:
+
+- Zero-shot or fine-tuning with a maximum of 10,000 epochs; number of
+  estimators: 1 or 2. Fine-tuning uses early stopping with patience 20.
+- For fine-tuned trials: learning rate from 1e-5 to 1e-3 on a log scale,
+  and warmup steps of 10, 50, 100, or 1000. Patience is fixed at 20.
+- For fine-tuned trials: feature shuffling and class shuffling, each on or off.
+
+By default the search targets 20 completed trials. Use, for example,
+`python -m mitra.mitra_train --n-trials 5` to target five completed trials,
+or increase that number to extend the same study. Completed trials are reused
+when resuming; failed and interrupted trials do not count toward the target.
+Run one search process at a time. The full search can take many hours,
+especially with two estimators. Each completed trial is uploaded to W&B as
+`mitra-trial-<number>`; the best is chosen using validation KS.
 
 On GPUs with limited memory, MITRA may retry with a smaller support set after
 an out-of-memory error; a GPU with more available memory can reduce retries.
@@ -41,6 +55,12 @@ training. Raw model scores
 are not guaranteed to be calibrated churn probabilities; assess and, if needed,
 calibrate them on separate data before using them as probabilities.
 
-Training logs validation metrics and confusion matrices to W&B. Predictors are
+Training logs MSE and binary cross-entropy on the full training split and all
+validation metrics and confusion matrices to W&B. MITRA predicts using labeled
+training examples as in-context support, so training predictions may use the
+same examples' labels and can be optimistically biased; use validation and test
+metrics for model assessment. The training split includes the internal holdout
+used for early stopping. Test metrics are reported by the test command.
+Predictors are
 saved as artifacts and Optuna trials are tracked in the local SQLite study.
 Test results are written to `mitra/test_results_natural_v2/` and logged to W&B.

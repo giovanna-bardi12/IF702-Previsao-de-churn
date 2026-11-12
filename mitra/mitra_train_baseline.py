@@ -13,12 +13,13 @@ import wandb
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
 from src.run_tags import wandb_provenance_tags
 from mitra.common import (
-    DEVICE, MODEL_DIR, VARIATION, fit_predictor, load_splits,
+    DEVICE, MAX_FINE_TUNE_EPOCHS, MODEL_DIR, PATIENCE, VARIATION,
+    evaluate_predictor, fit_predictor, load_splits,
     positive_probabilities,
 )
 
 
-BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": 50}
+BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": MAX_FINE_TUNE_EPOCHS, "patience": PATIENCE}
 FIT_TIME_LIMIT_SECONDS = None
 BASELINE_DIR = MODEL_DIR / "baseline_natural_v2"
 CONFIG_PATH = BASELINE_DIR / "config.json"
@@ -66,10 +67,13 @@ def main():
         probabilities = positive_probabilities(predictor, val_df)
         inference_seconds = time.perf_counter() - prediction_started
         metrics = calculate_metrics(val_df["Churn"].to_numpy(dtype=int), probabilities)
+        train_metrics = evaluate_predictor(predictor, train_df)
 
         wandb.log({
             "fit_time_seconds": fit_seconds,
             "val_inference_time_seconds": inference_seconds,
+            "train_mse": float(train_metrics["mse"]),
+            "train_binary_cross_entropy": float(train_metrics["binary_cross_entropy"]),
             **{f"val_{key}": float(metrics[key]) for key in METRIC_NAMES},
         })
         fig = plot_confusion_matrix_figure(metrics["confusion_matrix"])
@@ -93,6 +97,7 @@ def main():
             "predictor_path": str(predictor_path.relative_to(MODEL_DIR)),
             "fit_time_seconds": fit_seconds,
             "inference_time_seconds": inference_seconds,
+            "train_metrics": {key: float(train_metrics[key]) for key in ("mse", "binary_cross_entropy")},
             "val_metrics": {key: float(metrics[key]) for key in METRIC_NAMES},
         }
         CONFIG_PATH.write_text(json.dumps(config, indent=2))
@@ -101,6 +106,8 @@ def main():
         print(f"Requested fine-tuning steps: {BASELINE_PARAMS['fine_tune_steps']}")
         print(f"Fit time: {fit_seconds:.2f} sec")
         print(f"Validation inference time: {inference_seconds:.4f} sec for {len(val_df)} rows")
+        for key in ("mse", "binary_cross_entropy"):
+            print(f"Train {key}: {train_metrics[key]:.4f}")
         for key in METRIC_NAMES:
             print(f"Val {key}: {metrics[key]:.4f}")
         print(f"Predictor saved at {predictor_path}")

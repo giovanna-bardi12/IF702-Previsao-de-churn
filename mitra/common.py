@@ -17,6 +17,8 @@ VARIATION = "missing_encode_normalize"
 MITRA_DATA_DIR = PROCESSED_DIR / "mitra_natural"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 NUM_GPUS = 1 if DEVICE == "cuda" else 0
+PATIENCE = 20
+MAX_FINE_TUNE_EPOCHS = 10_000
 
 
 def load_splits(data_dir=MITRA_DATA_DIR):

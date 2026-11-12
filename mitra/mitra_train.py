@@ -2,6 +2,7 @@
 
 Run from the repository root with ``python -m mitra.mitra_train``.
 """
+import argparse
 import json
 import os
 import sys
@@ -18,15 +19,17 @@ import wandb
 from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
 from src.run_tags import wandb_provenance_tags
 from mitra.common import (
-    DEVICE, MODEL_DIR, VARIATION, fit_predictor, load_splits,
+    DEVICE, MAX_FINE_TUNE_EPOCHS, MODEL_DIR, PATIENCE, VARIATION,
+    evaluate_predictor, fit_predictor, load_splits,
     positive_probabilities,
 )
 
 
 OBJECTIVE_METRIC = "ks"
-FINE_TUNE_STEPS = [0, 10, 25, 50, 100]
+FINE_TUNE_STEPS = [0, MAX_FINE_TUNE_EPOCHS]
 FIT_TIME_LIMIT_SECONDS = None
-STUDY_NAME = f"mitra-churn-natural-v3-{OBJECTIVE_METRIC}"
+STUDY_NAME = f"mitra-churn-natural-v6-{OBJECTIVE_METRIC}"
+DEFAULT_TRIALS = 20
 STUDY_DB_PATH = MODEL_DIR / "churn_mitra_optuna.db"
 STORAGE = f"sqlite:///{STUDY_DB_PATH}"
 WANDB_ENTITY = "zovkar-ufpe"
@@ -37,16 +40,29 @@ def _relative(path):
     return os.path.relpath(path, MODEL_DIR)
 
 
-def objective(trial):
+def suggest_model_params(trial):
+    """Sample MITRA settings; fine-tuning-only settings are conditional."""
     fine_tune_steps = trial.suggest_categorical("fine_tune_steps", FINE_TUNE_STEPS)
-    fine_tune = fine_tune_steps > 0
-    search_params = {
-        "fine_tune": fine_tune,
-        "fine_tune_steps": fine_tune_steps,
+    params = {
+        "fine_tune": fine_tune_steps > 0,
+        "n_estimators": trial.suggest_categorical("n_estimators", [1, 2]),
     }
-    model_params = {"fine_tune": fine_tune}
-    if fine_tune:
-        model_params["fine_tune_steps"] = fine_tune_steps
+    if fine_tune_steps:
+        params.update({
+            "fine_tune_steps": fine_tune_steps,
+            "lr": trial.suggest_float("lr", 1e-5, 1e-3, log=True),
+            "warmup_steps": trial.suggest_categorical("warmup_steps", [10, 50, 100, 1000]),
+            "patience": PATIENCE,
+            "shuffle_features": trial.suggest_categorical("shuffle_features", [False, True]),
+            "shuffle_classes": trial.suggest_categorical("shuffle_classes", [False, True]),
+        })
+    return params
+
+
+def objective(trial):
+    model_params = suggest_model_params(trial)
+    fine_tune = model_params["fine_tune"]
+    fine_tune_steps = model_params.get("fine_tune_steps", 0)
 
     train_df, val_df, _ = load_splits()
     input_dim = len(train_df.columns) - 1
@@ -68,7 +84,7 @@ def objective(trial):
             *wandb_provenance_tags(),
         ],
         config={
-            **search_params,
+            **model_params,
             "variation": VARIATION,
             "input_dim": input_dim,
             "train_rows": len(train_df),
@@ -91,11 +107,14 @@ def objective(trial):
         probabilities = positive_probabilities(predictor, val_df)
         inference_seconds = time.perf_counter() - prediction_started
         metrics = calculate_metrics(val_df["Churn"].to_numpy(dtype=int), probabilities)
+        train_metrics = evaluate_predictor(predictor, train_df)
         model_names = predictor.model_names()
 
         wandb.log({
             "fit_time_seconds": fit_seconds,
             "val_inference_time_seconds": inference_seconds,
+            "train_mse": float(train_metrics["mse"]),
+            "train_binary_cross_entropy": float(train_metrics["binary_cross_entropy"]),
             **{f"val_{key}": float(metrics[key]) for key in METRIC_NAMES},
         })
         fig = plot_confusion_matrix_figure(metrics["confusion_matrix"])
@@ -112,10 +131,12 @@ def objective(trial):
         run.log_artifact(checkpoint_artifact)
 
         trial.set_user_attr("predictor_path", _relative(predictor_path))
-        trial.set_user_attr("params", search_params)
+        trial.set_user_attr("params", model_params)
         trial.set_user_attr("input_dim", input_dim)
         trial.set_user_attr("fit_time_seconds", fit_seconds)
         trial.set_user_attr("inference_time_seconds", inference_seconds)
+        for key in ("mse", "binary_cross_entropy"):
+            trial.set_user_attr(f"train_{key}", float(train_metrics[key]))
         for key in METRIC_NAMES:
             trial.set_user_attr(f"val_{key}", float(metrics[key]))
         return float(metrics[OBJECTIVE_METRIC])
@@ -130,22 +151,46 @@ def print_top_trials(study, top_k=5):
     for rank, trial in enumerate(best_trials, 1):
         print(f"--- Top {rank} (Trial #{trial.number}) ---")
         print(f"Validation KS: {trial.value:.4f}")
-        print(f"Fine-tuning: {trial.user_attrs['params']['fine_tune']} | requested steps: {trial.user_attrs['params']['fine_tune_steps']}")
+        print(f"Parameters: {json.dumps(trial.user_attrs['params'], sort_keys=True)}")
         print(f"Fit time: {trial.user_attrs['fit_time_seconds']:.2f} sec")
+        for key in ("mse", "binary_cross_entropy"):
+            print(f"Train {key}: {trial.user_attrs[f'train_{key}']:.4f}")
         for key in METRIC_NAMES:
             print(f"Val {key}: {trial.user_attrs[f'val_{key}']:.4f}")
         print(f"Predictor: {trial.user_attrs['predictor_path']}\n")
 
 
-if __name__ == "__main__":
+def main(n_trials=DEFAULT_TRIALS):
+    if n_trials < 1:
+        raise ValueError("--n-trials must be at least 1")
     study = optuna.create_study(
         study_name=STUDY_NAME,
         storage=STORAGE,
         direction="maximize",
-        sampler=optuna.samplers.GridSampler({"fine_tune_steps": FINE_TUNE_STEPS}, seed=42),
         load_if_exists=True,
     )
-    remaining = len(FINE_TUNE_STEPS) - len(study.trials)
+    existing = study.trials
+    # A fresh sampler seed on resume avoids replaying the same startup samples.
+    study.sampler = optuna.samplers.TPESampler(seed=42 + len(existing))
+    if not existing:
+        study.enqueue_trial({"fine_tune_steps": 0, "n_estimators": 1})
+        study.enqueue_trial({
+            "fine_tune_steps": MAX_FINE_TUNE_EPOCHS, "n_estimators": 1, "lr": 1e-4,
+            "warmup_steps": 1000,
+            "shuffle_features": False, "shuffle_classes": False,
+        })
+    completed = sum(t.state == optuna.trial.TrialState.COMPLETE for t in study.trials)
+    remaining = max(0, n_trials - completed)
+    print(f"Optuna study {STUDY_NAME}: {completed} completed, target {n_trials}, "
+          f"running up to {remaining} more trial(s).", flush=True)
     if remaining > 0:
         study.optimize(objective, n_trials=remaining)
     print_top_trials(study)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--n-trials", type=int, default=DEFAULT_TRIALS,
+                        help="Target number of completed trials (default: %(default)s)")
+    args = parser.parse_args()
+    main(n_trials=args.n_trials)
