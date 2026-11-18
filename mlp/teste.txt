@@ -1,0 +1,94 @@
+ cuda: True
+================ TESTE: Top 1 (Trial #197, checkpoint 'ks') ================
+Val KS (seleção): 0.5715
+Test loss (BCE): 0.4751
+Test ks: 0.5288
+Test roc_auc: 0.8391
+Test mse: 0.1577
+Test binary_cross_entropy: 0.4751
+Test accuracy: 0.7622
+Test precision: 0.5387
+Test recall: 0.7286
+Test f1: 0.6194
+Tempo médio de inferência: 0.015631 s/batch
+Matriz de confusão:
+ [[1002  292]
+ [ 127  341]] 
+
+================ TESTE: Top 2 (Trial #60, checkpoint 'ks') ================
+Val KS (seleção): 0.5708
+Test loss (BCE): 0.4831
+Test ks: 0.5318
+Test roc_auc: 0.8422
+Test mse: 0.1601
+Test binary_cross_entropy: 0.4831
+Test accuracy: 0.7633
+Test precision: 0.5388
+Test recall: 0.7564
+Test f1: 0.6293
+Tempo médio de inferência: 0.000259 s/batch
+Matriz de confusão:
+ [[991 303]
+ [114 354]] 
+
+================ TESTE: Top 3 (Trial #124, checkpoint 'ks') ================
+Val KS (seleção): 0.5708
+Test loss (BCE): 0.4768
+Test ks: 0.5203
+Test roc_auc: 0.8369
+Test mse: 0.1572
+Test binary_cross_entropy: 0.4768
+Test accuracy: 0.7628
+Test precision: 0.5385
+Test recall: 0.7479
+Test f1: 0.6261
+Tempo médio de inferência: 0.000234 s/batch
+Matriz de confusão:
+ [[994 300]
+ [118 350]] 
+
+================ TESTE: Top 4 (Trial #76, checkpoint 'ks') ================
+Val KS (seleção): 0.5700
+Test loss (BCE): 0.4751
+Test ks: 0.5081
+Test roc_auc: 0.8314
+Test mse: 0.1577
+Test binary_cross_entropy: 0.4751
+Test accuracy: 0.7633
+Test precision: 0.5417
+Test recall: 0.7073
+Test f1: 0.6135
+Tempo médio de inferência: 0.000240 s/batch
+Matriz de confusão:
+ [[1014  280]
+ [ 137  331]] 
+
+================ TESTE: Top 5 (Trial #132, checkpoint 'ks') ================
+Val KS (seleção): 0.5700
+Test loss (BCE): 0.4714
+Test ks: 0.5298
+Test roc_auc: 0.8362
+Test mse: 0.1561
+Test binary_cross_entropy: 0.4714
+Test accuracy: 0.7662
+Test precision: 0.5471
+Test recall: 0.6944
+Test f1: 0.6121
+Tempo médio de inferência: 0.000231 s/batch
+Matriz de confusão:
+ [[1025  269]
+ [ 143  325]] 
+
+Resultados salvos em /tmp/churn32139/IF702-Previsao-de-churn/mlp/test_results/mlp_test_metrics_ks.csv
+Finish
+>> Sincronizando resultados de volta para a home e limpando o node...
+sending incremental file list
+mlp/
+mlp/test_results/
+mlp/test_results/confusion_matrix_mlp_trial124_ks.png
+mlp/test_results/confusion_matrix_mlp_trial132_ks.png
+mlp/test_results/confusion_matrix_mlp_trial197_ks.png
+mlp/test_results/confusion_matrix_mlp_trial60_ks.png
+mlp/test_results/confusion_matrix_mlp_trial76_ks.png
+mlp/test_results/mlp_test_metrics_ks.csv
+src/

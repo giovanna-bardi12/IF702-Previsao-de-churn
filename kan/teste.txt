@@ -1,22 +1,20 @@
 BASELINE
 
-
-python kan/kan_test.py --baseline
 ================ TESTE: KAN baseline (checkpoint 'ks') ================
-Val KS (seleção): 0.5607
-Test loss (BCE): 0.4894
-Test ks: 0.5390
-Test roc_auc: 0.8444
-Test mse: 0.1631
-Test binary_cross_entropy: 0.4894
-Test accuracy: 0.7565
-Test precision: 0.5280
-Test recall: 0.7863
-Test f1: 0.6318
-Tempo médio de inferência: 0.003977 s/batch
+Val KS (seleção): 0.5638
+Test loss (BCE): 0.4788
+Test ks: 0.5494
+Test roc_auc: 0.8469
+Test mse: 0.1591
+Test binary_cross_entropy: 0.4788
+Test accuracy: 0.7650
+Test precision: 0.5397
+Test recall: 0.7842
+Test f1: 0.6394
+Tempo médio de inferência: 0.003123 s/batch
 Matriz de confusão:
- [[965 329]
- [100 368]] 
+ [[981 313]
+ [101 367]] 
 
 Resultados salvos em /home/ju/Desktop/redes_neurais/IF702-Previsao-de-churn/kan/test_results/kan_baseline_test_metrics_ks.csv
 
