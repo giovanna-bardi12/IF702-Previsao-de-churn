@@ -29,8 +29,6 @@ from kan_train import  GRID_UPDATE_FREQ, GRID_UPDATE_UNTIL, KS_MIN_DELTA, LOSS_M
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Hiperparâmetros fixos: valores padrão de KAN / Adam
-# (grid 5, spline cúbica, ativação base SiLU, lr 1e-3, sem weight decay)
 BASELINE_PARAMS = {
     "lr": 1e-3,
     "batch_size": 64,
@@ -38,7 +36,7 @@ BASELINE_PARAMS = {
     "num_hidden_layers": 1,
     "hidden_dim": 16,
     "grid_size": 5,
-    "spline_order": 3,
+    "spline_order": 2,
     "activation": "SiLU",
     "reg_lambda": 0.0}
 SEED = 42
