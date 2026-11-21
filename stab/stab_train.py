@@ -20,9 +20,9 @@ from src.run_tags import wandb_provenance_tags
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 VARIATION = "missing_encode_normalize"
-MIN_EPOCHS, MAX_EPOCHS, PATIENCE, N_TRIALS = 50, 70, 15, 30
+MIN_EPOCHS, MAX_EPOCHS, PATIENCE, N_TRIALS = 50, 10000, 15, 30
 LOSS_MIN_DELTA, KS_MIN_DELTA = 1e-4, 1e-3
-WANDB_ENTITY, WANDB_PROJECT = "gmcb", "IF702-Projeto-Final"
+WANDB_ENTITY, WANDB_PROJECT = "zovkar-ufpe", "IF702-Projeto-Final"
 STUDY_NAME = "stab-churn-ks"
 STORAGE = f"sqlite:///{MODEL_DIR / 'churn_stab_optuna.db'}"
 SEED = 42
