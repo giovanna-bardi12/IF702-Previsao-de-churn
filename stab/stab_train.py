@@ -11,6 +11,7 @@ import numpy as np
 import optuna
 import torch
 from torch import nn
+from torch.utils.data import DataLoader
 import wandb
 
 from models_stab import build_stab, train_epoch, validate_epoch
@@ -20,7 +21,7 @@ from src.run_tags import wandb_provenance_tags
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 VARIATION = "missing_encode_normalize"
-MIN_EPOCHS, MAX_EPOCHS, PATIENCE, N_TRIALS = 50, 10000, 15, 30
+MIN_EPOCHS, MAX_EPOCHS, PATIENCE, N_TRIALS = 50, 10000, 15, 150
 LOSS_MIN_DELTA, KS_MIN_DELTA = 1e-4, 1e-3
 WANDB_ENTITY, WANDB_PROJECT = "zovkar-ufpe", "IF702-Projeto-Final"
 STUDY_NAME = "stab-churn-ks"
@@ -39,6 +40,10 @@ def set_seed(seed=SEED):
 def train_run(params, strategy, trial=None):
     set_seed()
     train_loader, val_loader, _ = get_dataloaders(batch_size=params["batch_size"])
+    train_eval_loader = DataLoader(
+        train_loader.dataset, batch_size=params["batch_size"], shuffle=False,
+        generator=torch.Generator().manual_seed(SEED),
+    )
     input_dim = train_loader.dataset.tensors[0].shape[1]
     d_model = params["d_model"]
     model = build_stab(
@@ -67,6 +72,8 @@ def train_run(params, strategy, trial=None):
     try:
         for epoch in range(1, MAX_EPOCHS + 1):
             train_loss = train_epoch(model, train_loader, optimizer, criterion, DEVICE)
+            _, _, train_labels, train_probs = validate_epoch(model, train_eval_loader, criterion, DEVICE)
+            train_mse = float(np.mean((train_labels - train_probs) ** 2))
             val_loss, inference_time, labels, probs = validate_epoch(model, val_loader, criterion, DEVICE)
             metrics = calculate_metrics(labels, probs)
             times.append(inference_time)
@@ -83,7 +90,7 @@ def train_run(params, strategy, trial=None):
                 best_metrics["ks"] = metrics
                 torch.save(model.state_dict(), paths["ks"])
             stale = 0 if loss_improved or ks_improved else stale + 1
-            run.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss,
+            run.log({"epoch": epoch, "train_loss": train_loss, "train_mse": train_mse, "val_loss": val_loss,
                      **{f"val_{k}": float(metrics[k]) for k in METRIC_NAMES},
                      "val_inference_time_batch": inference_time, "epochs_without_improvement": stale})
             if trial is not None:
