@@ -25,6 +25,7 @@ def handle_missing_values(x_train, x_val, x_test, type="Zero"): #Zero  #Monthly
     # Regra de negócio específica para TotalCharges (clientes com tenure = 0)
     if "TotalCharges" in x_train.columns:
         for x in (x_train, x_val, x_test):
+            x["TotalCharges"] = pd.to_numeric(x["TotalCharges"], errors="coerce")
             fill = 0.0 if type == "Zero" else x["MonthlyCharges"]
             x["TotalCharges"] = x["TotalCharges"].fillna(fill)
  

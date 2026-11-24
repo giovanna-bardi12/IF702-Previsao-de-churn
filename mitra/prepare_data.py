@@ -4,5 +4,6 @@ from src.prepare_data import prepare_data
 
 
 if __name__ == "__main__":
-    prepare_data(output_dir=MITRA_DATA_DIR, oversample_train=False, oversample_val=False)
+    prepare_data(preprocessing_variations=[["missing"], ["missing", "encode", "normalize"]],
+                 output_dir=MITRA_DATA_DIR, oversample_train=False, oversample_val=False)
     print(f"MITRA splits saved to {MITRA_DATA_DIR}")

@@ -1,7 +1,9 @@
 """Train the fixed-configuration MITRA baseline and persist its predictor."""
+import argparse
 import json
 import sys
 import time
+import uuid
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -10,28 +12,32 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import matplotlib.pyplot as plt
 import wandb
 
-from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure
+from src.metrics import METRIC_NAMES, calculate_metrics, plot_confusion_matrix_figure, validation_ks_threshold
 from src.run_tags import wandb_provenance_tags
 from mitra.common import (
-    DEVICE, MAX_FINE_TUNE_EPOCHS, MODEL_DIR, PATIENCE, VARIATION,
+    DATA_MODE, DEVICE, EXPERIMENT_ID, MAX_FINE_TUNE_EPOCHS, MODEL_DIR, PATIENCE, VARIATION,
     evaluate_predictor, fit_predictor, load_splits,
     positive_probabilities,
 )
 
 
-BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": MAX_FINE_TUNE_EPOCHS, "patience": PATIENCE}
+BASELINE_PARAMS = {"fine_tune": True, "fine_tune_steps": MAX_FINE_TUNE_EPOCHS,
+                   "patience": PATIENCE, "warmup_steps": 10}
 FIT_TIME_LIMIT_SECONDS = None
-BASELINE_DIR = MODEL_DIR / "baseline_natural_v2"
+BASELINE_DIR = MODEL_DIR / "baselines" / EXPERIMENT_ID / "patience-10"
 CONFIG_PATH = BASELINE_DIR / "config.json"
+ZERO_SHOT_CONFIG_PATH = BASELINE_DIR / "zero_shot.json"
 
 
-def main():
+def main(zero_shot=False):
+    params = {"fine_tune": False, "n_estimators": 1} if zero_shot else BASELINE_PARAMS
+    label = "zero_shot" if zero_shot else "baseline"
     train_df, val_df, _ = load_splits()
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     run = wandb.init(
         entity="zovkar-ufpe",
         project="IF702-Projeto-Final",
-        name="MITRA_baseline",
+        name=f"MITRA_{label}_{EXPERIMENT_ID}",
         group="mitra_baseline",
         tags=[
             "model:mitra",
@@ -40,13 +46,14 @@ def main():
             "strategy:baseline",
             f"data:{VARIATION}",
             f"device:{DEVICE}",
-            "fine-tune:on",
-            f"fine-tune-steps:{BASELINE_PARAMS['fine_tune_steps']}",
+            f"fine-tune:{'off' if zero_shot else 'on'}",
+            f"fine-tune-steps:{params.get('fine_tune_steps', 0)}",
             *wandb_provenance_tags(),
         ],
         config={
-            **BASELINE_PARAMS,
+            **params,
             "variation": VARIATION,
+            "data_mode": DATA_MODE,
             "input_dim": len(train_df.columns) - 1,
             "train_rows": len(train_df),
             "validation_rows": len(val_df),
@@ -56,10 +63,10 @@ def main():
         dir=str(MODEL_DIR),
     )
     try:
-        predictor_path = Path(run.dir) / "mitra_predictor"
+        predictor_path = MODEL_DIR / "predictors" / EXPERIMENT_ID / f"{label}-{uuid.uuid4().hex}"
         fit_started = time.perf_counter()
         predictor = fit_predictor(
-            train_df, predictor_path, BASELINE_PARAMS,
+            train_df, predictor_path, params,
             time_limit=FIT_TIME_LIMIT_SECONDS,
         )
         fit_seconds = time.perf_counter() - fit_started
@@ -67,6 +74,7 @@ def main():
         probabilities = positive_probabilities(predictor, val_df)
         inference_seconds = time.perf_counter() - prediction_started
         metrics = calculate_metrics(val_df["Churn"].to_numpy(dtype=int), probabilities)
+        val_threshold = validation_ks_threshold(val_df["Churn"].to_numpy(dtype=int), probabilities)
         train_metrics = evaluate_predictor(predictor, train_df)
 
         wandb.log({
@@ -74,6 +82,7 @@ def main():
             "val_inference_time_seconds": inference_seconds,
             "train_mse": float(train_metrics["mse"]),
             "train_binary_cross_entropy": float(train_metrics["binary_cross_entropy"]),
+            "val_ks_threshold": val_threshold,
             **{f"val_{key}": float(metrics[key]) for key in METRIC_NAMES},
         })
         fig = plot_confusion_matrix_figure(metrics["confusion_matrix"])
@@ -84,13 +93,15 @@ def main():
             "val_inference_time_seconds": inference_seconds,
             "best_val_ks": float(metrics["ks"]),
         })
-        checkpoint_artifact = wandb.Artifact("mitra-baseline", type="model")
+        checkpoint_artifact = wandb.Artifact(f"mitra-{label}-{EXPERIMENT_ID}", type="model")
         checkpoint_artifact.add_dir(str(predictor_path))
         run.log_artifact(checkpoint_artifact)
 
         config = {
-            "params": BASELINE_PARAMS,
+            "params": params,
             "variation": VARIATION,
+            "data_mode": DATA_MODE,
+            "val_ks_threshold": val_threshold,
             "input_dim": len(train_df.columns) - 1,
             "train_rows": len(train_df),
             "validation_rows": len(val_df),
@@ -100,10 +111,10 @@ def main():
             "train_metrics": {key: float(train_metrics[key]) for key in ("mse", "binary_cross_entropy")},
             "val_metrics": {key: float(metrics[key]) for key in METRIC_NAMES},
         }
-        CONFIG_PATH.write_text(json.dumps(config, indent=2))
+        (ZERO_SHOT_CONFIG_PATH if zero_shot else CONFIG_PATH).write_text(json.dumps(config, indent=2))
 
         print("================ MITRA BASELINE (validation) ================")
-        print(f"Requested fine-tuning steps: {BASELINE_PARAMS['fine_tune_steps']}")
+        print(f"Requested fine-tuning steps: {params.get('fine_tune_steps', 0)}")
         print(f"Fit time: {fit_seconds:.2f} sec")
         print(f"Validation inference time: {inference_seconds:.4f} sec for {len(val_df)} rows")
         for key in ("mse", "binary_cross_entropy"):
@@ -116,4 +127,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--zero-shot", action="store_true", help="Evaluate one zero-shot predictor")
+    main(zero_shot=parser.parse_args().zero_shot)

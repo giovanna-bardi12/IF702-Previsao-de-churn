@@ -5,7 +5,7 @@ numpy>=1.21.0
 pandas>=1.4.0
 scikit-learn>=1.0.2
 
-optuna>=3.0.0
+optuna>=3.1.0
 wandb>=0.15.0
 
 matplotlib>=3.5.0

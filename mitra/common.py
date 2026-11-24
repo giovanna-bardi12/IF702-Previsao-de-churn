@@ -1,4 +1,5 @@
 """Shared data and AutoGluon helpers for Mitra experiments."""
+import os
 from pathlib import Path
 
 import numpy as np
@@ -13,16 +14,22 @@ from src.metrics import calculate_metrics
 
 MODEL_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = MODEL_DIR.parent
-VARIATION = "missing_encode_normalize"
+VARIATION = os.environ.get("MITRA_PREPROCESSING", "missing_encode_normalize")
+DATA_MODE = os.environ.get("MITRA_DATA_MODE", "balanced")
+if VARIATION not in ("missing", "missing_encode_normalize"):
+    raise ValueError("MITRA_PREPROCESSING must be 'missing' or 'missing_encode_normalize'")
+if DATA_MODE not in ("balanced", "natural"):
+    raise ValueError("MITRA_DATA_MODE must be 'balanced' or 'natural'")
+EXPERIMENT_ID = f"{DATA_MODE}-{VARIATION}"
 MITRA_DATA_DIR = PROCESSED_DIR / "mitra_natural"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 NUM_GPUS = 1 if DEVICE == "cuda" else 0
-PATIENCE = 20
+PATIENCE = 10
 MAX_FINE_TUNE_EPOCHS = 10_000
 
 
 def load_splits(data_dir=MITRA_DATA_DIR):
-    """Read the MITRA splits with their original class proportions."""
+    """Read independent splits; balance validation only for the balanced protocol."""
     data_dir = Path(data_dir)
     frames = {}
     for split in ("train", "val", "test"):
@@ -32,7 +39,21 @@ def load_splits(data_dir=MITRA_DATA_DIR):
         frames[split] = pd.read_csv(path)
         if TARGET_COLUMN not in frames[split]:
             raise ValueError(f"Coluna alvo {TARGET_COLUMN!r} não existe em {path}")
+    if DATA_MODE == "balanced":
+        frames["val"] = balance_frame(frames["val"])
     return frames["train"], frames["val"], frames["test"]
+
+
+def balance_frame(frame):
+    """Repeat minority rows to balance classes without crossing split boundaries."""
+    counts = frame[TARGET_COLUMN].value_counts()
+    if len(counts) != 2:
+        raise ValueError("Both churn classes are required for oversampling")
+    target = counts.max()
+    groups = [group if len(group) == target else pd.concat([
+        group, group.sample(n=target - len(group), replace=True, random_state=RANDOM_SEED)
+    ]) for _, group in frame.groupby(TARGET_COLUMN)]
+    return pd.concat(groups).sample(frac=1, random_state=RANDOM_SEED).reset_index(drop=True)
 
 
 def make_predictor(path, *, verbosity=2):
@@ -48,10 +69,21 @@ def make_predictor(path, *, verbosity=2):
 
 def fit_predictor(train_df, path, params, *, time_limit=None, verbosity=3):
     """Fit MITRA using an internal holdout for early stopping, not model selection."""
-    fit_df, early_stop_df = train_test_split(
-        train_df, test_size=0.15, random_state=RANDOM_SEED,
-        stratify=train_df[TARGET_COLUMN],
-    )
+    if params.get("fine_tune", False):
+        fit_df, early_stop_df = train_test_split(
+            train_df, test_size=0.15, random_state=RANDOM_SEED,
+            stratify=train_df[TARGET_COLUMN],
+        )
+    else:
+        # AutoGluon otherwise reserves an automatic holdout, shrinking support.
+        # This internal score is in-sample; model selection uses external validation.
+        fit_df, early_stop_df = train_df, train_df
+    if DATA_MODE == "balanced":
+        fit_df = balance_frame(fit_df)
+    print(f"MITRA data mode={DATA_MODE}, preprocessing={VARIATION}; "
+          f"fit class counts={fit_df[TARGET_COLUMN].value_counts().to_dict()}, "
+          f"internal validation class counts={early_stop_df[TARGET_COLUMN].value_counts().to_dict()}",
+          flush=True)
     predictor = make_predictor(path, verbosity=verbosity)
     predictor.fit(
         train_data=fit_df,
@@ -68,7 +100,7 @@ def fit_predictor(train_df, path, params, *, time_limit=None, verbosity=3):
 def positive_probabilities(predictor, frame):
     """Return P(Churn=1), handling AutoGluon's Series/DataFrame outputs."""
     features = frame.drop(columns=[TARGET_COLUMN], errors="ignore")
-    prediction = predictor.predict_proba(features, model="Mitra")
+    prediction = predictor.predict_proba(features)
     if isinstance(prediction, pd.DataFrame):
         if 1 not in prediction.columns:
             raise ValueError(f"Expected churn class 1 in probability columns: {prediction.columns.tolist()}")
