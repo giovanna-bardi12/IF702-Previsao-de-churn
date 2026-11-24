@@ -1,0 +1,118 @@
+================ TOP 5 MELHORES MODELOS (validação) ================
+
+--- Top 1 (Trial #197) ---
+Melhor KS na época 50 | menor val_loss na época 25
+Parâmetros treináveis: 12545
+Val ks: 0.5715
+Val roc_auc: 0.8528
+Val mse: 0.1573
+Val binary_cross_entropy: 0.4793
+Val accuracy: 0.7711
+Val precision: 0.7829
+Val recall: 0.7502
+Val f1: 0.7662
+Average Inference Time: 0.000206 sec/batch
+Hyperparameters:
+  - lr: 0.02090286776052495
+  - batch_size: 256
+  - weight_decay: 0.0017364970820949717
+  - num_hidden_layers: 1
+  - hidden_dim: 256
+  - activation: Tanh
+  - dropout: 0.037061754767314006
+  - batch_norm: True
+--------------------------------------------------
+
+--- Top 2 (Trial #60) ---
+Melhor KS na época 10 | menor val_loss na época 13
+Parâmetros treináveis: 393
+Val ks: 0.5708
+Val roc_auc: 0.8520
+Val mse: 0.1574
+Val binary_cross_entropy: 0.4794
+Val accuracy: 0.7792
+Val precision: 0.7794
+Val recall: 0.7788
+Val f1: 0.7791
+Average Inference Time: 0.000210 sec/batch
+Hyperparameters:
+  - lr: 0.016656517085077954
+  - batch_size: 256
+  - weight_decay: 0.0012136187493843153
+  - num_hidden_layers: 1
+  - hidden_dim: 8
+  - activation: Tanh
+  - dropout: 0.04834207119259794
+  - batch_norm: True
+--------------------------------------------------
+
+--- Top 3 (Trial #124) ---
+Melhor KS na época 11 | menor val_loss na época 11
+Parâmetros treináveis: 785
+Val ks: 0.5708
+Val roc_auc: 0.8502
+Val mse: 0.1593
+Val binary_cross_entropy: 0.4877
+Val accuracy: 0.7660
+Val precision: 0.7713
+Val recall: 0.7564
+Val f1: 0.7638
+Average Inference Time: 0.000198 sec/batch
+Hyperparameters:
+  - lr: 0.07792519565390939
+  - batch_size: 256
+  - weight_decay: 0.005670140133267499
+  - num_hidden_layers: 1
+  - hidden_dim: 16
+  - activation: Tanh
+  - dropout: 0.13791322793025595
+  - batch_norm: True
+--------------------------------------------------
+
+--- Top 4 (Trial #76) ---
+Melhor KS na época 24 | menor val_loss na época 18
+Parâmetros treináveis: 785
+Val ks: 0.5700
+Val roc_auc: 0.8464
+Val mse: 0.1619
+Val binary_cross_entropy: 0.4904
+Val accuracy: 0.7467
+Val precision: 0.7708
+Val recall: 0.7022
+Val f1: 0.7349
+Average Inference Time: 0.000211 sec/batch
+Hyperparameters:
+  - lr: 0.0903784085513201
+  - batch_size: 256
+  - weight_decay: 0.0009386429416772786
+  - num_hidden_layers: 1
+  - hidden_dim: 16
+  - activation: Tanh
+  - dropout: 0.06398288863196502
+  - batch_norm: True
+--------------------------------------------------
+
+--- Top 5 (Trial #132) ---
+Melhor KS na época 8 | menor val_loss na época 5
+Parâmetros treináveis: 785
+Val ks: 0.5700
+Val roc_auc: 0.8476
+Val mse: 0.1607
+Val binary_cross_entropy: 0.4866
+Val accuracy: 0.7622
+Val precision: 0.7811
+Val recall: 0.7285
+Val f1: 0.7539
+Average Inference Time: 0.000194 sec/batch
+Hyperparameters:
+  - lr: 0.09666114728889319
+  - batch_size: 256
+  - weight_decay: 0.0003343379410845606
+  - num_hidden_layers: 1
+  - hidden_dim: 16
+  - activation: Tanh
+  - dropout: 0.056718406479916404
+  - batch_norm: True
+--------------------------------------------------
+
+Finish

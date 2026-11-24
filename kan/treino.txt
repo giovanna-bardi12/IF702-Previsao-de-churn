@@ -317,3 +317,20 @@ Hyperparameters:
   - reg_lambda: 6.320377885875147e-06
 --------------------------------------------------
 
+
+
+================ KAN BASELINE (validação) ================
+Parâmetros treináveis: 6624
+Épocas: 23 | melhor KS na época 6 | menor val_loss na época 8
+Val ks: 0.5638
+Val roc_auc: 0.8605
+Val mse: 0.1522
+Val binary_cross_entropy: 0.4638
+Val accuracy: 0.7765
+Val precision: 0.7698
+Val recall: 0.7889
+Val f1: 0.7792
+Average Inference Time: 0.002610 sec/batch
+
+Checkpoints e config salvos em /home/ju/Desktop/redes_neurais/IF702-Previsao-de-churn/kan/baseline
+Para avaliar no teste: python kan/kan_test.py --baseline
